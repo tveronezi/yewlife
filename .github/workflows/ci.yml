@@ -36,6 +36,8 @@ jobs:
         run: cargo install --locked trunk
       - name: Install wasm-bindgen-cli
         run: cargo install --locked wasm-bindgen-cli
+      - name: Add wasm32-unknown-unknown target
+        run: rustup target add wasm32-unknown-unknown
       - name: Build application binary
         run: ./scripts/ci_app
       - name: Build docker image
