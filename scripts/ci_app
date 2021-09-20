@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+export CARGO_NET_GIT_FETCH_WITH_CLI=true
+
+# Check style
+cargo fmt --all -- --check
+
+# Lint it
+cargo clippy --all-targets --all-features -- -D warnings
+#cargo clippy --all-targets --all-features
+
+# Test it
+cargo test
+
+# Build it
+trunk build --release
+
