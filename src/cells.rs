@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub(crate) struct Cell {
@@ -104,8 +104,8 @@ impl Cells {
             column_min: y_min,
         } = self.boundaries();
         let mut new_universe = BTreeSet::new();
-        for line in x_min..x_max {
-            for column in y_min..y_max {
+        for line in (x_min - 1)..(x_max + 2) {
+            for column in (y_min - 1)..(y_max + 2) {
                 let neighbors = self.number_of_neighbors(line, column);
                 let this_cell = Cell { line, column };
                 let exist = self.universe.get(&this_cell).is_some();
@@ -129,52 +129,56 @@ mod tests {
     use super::*;
     use std::iter::FromIterator;
 
-    #[test]
-    fn test_boundaries() {
-        Cells {
-            universe: BTreeSet::from_iter(
-                vec![
-                    Cell { line: 0, column: 1 },
-                    Cell { line: 1, column: 2 },
-                    Cell { line: 2, column: 0 },
-                ]
-                    .iter()
-                    .cloned(),
-            ),
-        };
+    fn build_universe(matrix: &[&[i8]]) -> BTreeSet<Cell> {
+        let mut result = BTreeSet::new();
+        for (line, line_value) in matrix.iter().enumerate() {
+            for (column, column_value) in line_value.iter().enumerate() {
+                if *column_value != 0 {
+                    result.insert(Cell {
+                        line: line as i64,
+                        column: column as i64,
+                    });
+                }
+            }
+        }
+        result
     }
 
     #[test]
     fn test_universe_update() {
-        let universe = BTreeSet::from_iter(
-            vec![
-                Cell { line: 1, column: 0 },
-                Cell { line: 0, column: 0 },
-                Cell { line: 0, column: 0 },
-                Cell { line: 0, column: 1 },
-                Cell {
-                    line: 0,
-                    column: -1,
-                },
-            ]
-            .iter()
-            .cloned(),
-        );
-        // original universe
-        // xx
-        // x-
+        let universe = build_universe(&[&[0, 1, 0], &[0, 0, 1], &[1, 1, 1]]);
         let mut cells = Cells { universe };
         cells.update();
-        // new universe
-        // xx
-        // xx
         assert_eq!(
             cells.universe.iter().cloned().collect::<Vec<Cell>>(),
             vec![
-                Cell { line: 0, column: 0 },
-                Cell { line: 0, column: 1 },
                 Cell { line: 1, column: 0 },
+                Cell { line: 1, column: 2 },
+                Cell { line: 2, column: 1 },
+                Cell { line: 2, column: 2 },
+                Cell { line: 3, column: 1 }
+            ]
+        );
+        cells.update();
+        assert_eq!(
+            cells.universe.iter().cloned().collect::<Vec<Cell>>(),
+            vec![
+                Cell { line: 1, column: 2 },
+                Cell { line: 2, column: 0 },
+                Cell { line: 2, column: 2 },
+                Cell { line: 3, column: 1 },
+                Cell { line: 3, column: 2 }
+            ]
+        );
+        cells.update();
+        assert_eq!(
+            cells.universe.iter().cloned().collect::<Vec<Cell>>(),
+            vec![
                 Cell { line: 1, column: 1 },
+                Cell { line: 2, column: 2 },
+                Cell { line: 2, column: 3 },
+                Cell { line: 3, column: 1 },
+                Cell { line: 3, column: 2 }
             ]
         );
     }
