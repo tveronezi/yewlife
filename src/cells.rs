@@ -24,6 +24,7 @@ impl PartialOrd for Cell {
     }
 }
 
+#[derive(Eq, PartialEq, Debug)]
 pub(crate) struct Cells {
     universe: BTreeSet<Cell>,
 }
@@ -36,6 +37,21 @@ struct Boundaries {
 }
 
 impl Cells {
+    fn new(matrix: &str) -> Self {
+        let mut universe = BTreeSet::new();
+        for (line, line_value) in matrix.trim().lines().enumerate() {
+            for (column, entry) in line_value.chars().enumerate() {
+                if entry == '1' {
+                    universe.insert(Cell {
+                        line: line as i64,
+                        column: column as i64,
+                    });
+                }
+            }
+        }
+        Cells { universe }
+    }
+
     fn boundaries(&self) -> Boundaries {
         let lines: BTreeSet<i64> = self.universe.iter().map(|cell| cell.line).collect();
         let line_max = *lines.iter().max().expect("empty collection?");
@@ -129,57 +145,62 @@ mod tests {
     use super::*;
     use std::iter::FromIterator;
 
-    fn build_universe(matrix: &[&[i8]]) -> BTreeSet<Cell> {
-        let mut result = BTreeSet::new();
-        for (line, line_value) in matrix.iter().enumerate() {
-            for (column, column_value) in line_value.iter().enumerate() {
-                if *column_value != 0 {
-                    result.insert(Cell {
-                        line: line as i64,
-                        column: column as i64,
-                    });
-                }
-            }
-        }
-        result
-    }
-
     #[test]
     fn test_universe_update() {
-        let universe = build_universe(&[&[0, 1, 0], &[0, 0, 1], &[1, 1, 1]]);
-        let mut cells = Cells { universe };
-        cells.update();
-        assert_eq!(
-            cells.universe.iter().cloned().collect::<Vec<Cell>>(),
-            vec![
-                Cell { line: 1, column: 0 },
-                Cell { line: 1, column: 2 },
-                Cell { line: 2, column: 1 },
-                Cell { line: 2, column: 2 },
-                Cell { line: 3, column: 1 }
-            ]
+        let mut cells = Cells::new(
+            r#"
+010
+001
+111
+        "#,
         );
         cells.update();
         assert_eq!(
-            cells.universe.iter().cloned().collect::<Vec<Cell>>(),
-            vec![
-                Cell { line: 1, column: 2 },
-                Cell { line: 2, column: 0 },
-                Cell { line: 2, column: 2 },
-                Cell { line: 3, column: 1 },
-                Cell { line: 3, column: 2 }
-            ]
+            Cells::new(
+                r#"
+000
+101
+011
+010
+        "#
+            ),
+            cells
         );
         cells.update();
         assert_eq!(
-            cells.universe.iter().cloned().collect::<Vec<Cell>>(),
-            vec![
-                Cell { line: 1, column: 1 },
-                Cell { line: 2, column: 2 },
-                Cell { line: 2, column: 3 },
-                Cell { line: 3, column: 1 },
-                Cell { line: 3, column: 2 }
-            ]
+            Cells::new(
+                r#"
+000
+001
+101
+011
+        "#
+            ),
+            cells
+        );
+        cells.update();
+        assert_eq!(
+            Cells::new(
+                r#"
+0000
+0100
+0011
+0110
+        "#
+            ),
+            cells
+        );
+        cells.update();
+        assert_eq!(
+            Cells::new(
+                r#"
+0000
+0010
+0001
+0111
+        "#
+            ),
+            cells
         );
     }
 
