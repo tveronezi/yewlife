@@ -1,4 +1,4 @@
-use crate::components::counter::Counter;
+use crate::components::existence::Existence;
 use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
 
 pub struct App();
@@ -22,7 +22,7 @@ impl Component for App {
     fn view(&self) -> Html {
         html! {
             <div class=classes!("app", "app-center")>
-                <Counter/>
+                <Existence/>
             </div>
         }
     }
