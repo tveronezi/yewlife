@@ -1,4 +1,4 @@
-# yew-app
+# Conway's game of life with yew.rs
 
 Playing with `yew.rs`.
 
