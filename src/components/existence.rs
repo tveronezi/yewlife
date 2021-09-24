@@ -1,10 +1,11 @@
 use crate::components::bean::Bean;
 use crate::universe;
-use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
+use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
     Tick,
+    AddEntity(MouseEvent),
 }
 
 pub struct Existence {
@@ -12,6 +13,18 @@ pub struct Existence {
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
     value: universe::Universe,
+}
+
+impl Existence {
+    fn add_entity(&mut self, x: i32, y: i32) {
+        let column = x / (universe::CELL_SIZE as i32);
+        let line = y / (universe::CELL_SIZE as i32);
+        let entity = universe::Entity {
+            line: line as i64,
+            column: column as i64,
+        };
+        self.value.entities.insert(entity);
+    }
 }
 
 impl Component for Existence {
@@ -26,7 +39,6 @@ impl Component for Existence {
 111
         "#,
         );
-        log::info!("[create]: {:?}", universe);
         Self {
             link,
             value: universe,
@@ -34,46 +46,71 @@ impl Component for Existence {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        log::info!("[update]: {:?}", msg);
         match msg {
             Msg::Tick => {
                 self.value.tick();
-                log::info!("[update]: re-render");
+                true
+            }
+            Msg::AddEntity(event) => {
+                let x = event.x();
+                let y = event.y();
+                self.add_entity(x, y);
                 true
             }
         }
     }
 
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // Should only return "true" if new properties are different to
-        // previously received properties.
-        // This component has no properties so we will always return "false".
-        log::info!("[change]: {:?}", self.value);
         false
     }
 
     fn view(&self) -> Html {
-        log::info!("[view]: {:?}", self.value);
+        let window: web_sys::Window = utils::window();
+        let window_height = window
+            .inner_height()
+            .expect("Unable to load window height")
+            .as_f64()
+            .expect("height is not a number")
+            .round() as i64;
+        let window_width = window
+            .inner_width()
+            .expect("Unable to load window width")
+            .as_f64()
+            .expect("width is not a number")
+            .round() as i64;
         let entities = self
             .value
             .entities
             .iter()
+            .filter(|e| {
+                if e.column < 0 || e.line < 0 {
+                    return false;
+                }
+                if e.column * (universe::CELL_SIZE as i64) > window_width
+                    || e.line * (universe::CELL_SIZE as i64) > window_height
+                {
+                    return false;
+                }
+                true
+            })
             .map(|e| {
                 html! {
                     <Bean value={e.clone()} />
                 }
             })
             .collect::<Html>();
+        let on_tick_click = self.link.callback(|_| Msg::Tick);
+        let on_existence_click = self.link.callback(Msg::AddEntity);
         html! {
-            <div class=classes!("app-existence")>
+            <div onmousedown={on_existence_click} class=classes!("app-existence")>
+                { entities }
                 <div class="app-tick">
-                    <a  onclick=self.link.callback(|_| Msg::Tick)
+                    <a  onclick={on_tick_click}
                         class="btn-floating btn-large waves-effect waves-light red"
                     >
                         <i class="material-icons">{ "add" }</i>
                     </a>
                 </div>
-                { entities }
             </div>
         }
     }

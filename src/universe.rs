@@ -2,6 +2,8 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
 
+pub const CELL_SIZE: u8 = 10;
+
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Entity {
     pub line: i64,

@@ -413,6 +413,7 @@ dependencies = [
  "log",
  "wasm-bindgen",
  "wasm-logger",
+ "web-sys",
  "yew",
 ]
 

@@ -30,7 +30,6 @@ impl Component for Bean {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        log::info!("[update]: {:?}", msg);
         match msg {
             Msg::Die => {
                 // TODO: remove the element here
@@ -41,19 +40,15 @@ impl Component for Bean {
 
     fn change(&mut self, props: Self::Properties) -> ShouldRender {
         let changed = self.value != props.value;
-        log::info!(
-            "[change]: changed? {:?} [value: {:?}; props.value: {:?}]",
-            changed,
-            self.value,
-            props.value
-        );
         self.value = props.value;
         changed
     }
 
     fn view(&self) -> Html {
-        log::info!("[view]: {:?}", self.value);
-        let (x, y) = (self.value.line * 10, self.value.column * 10);
+        let (x, y) = (
+            self.value.line * (universe::CELL_SIZE as i64),
+            self.value.column * (universe::CELL_SIZE as i64),
+        );
         let style = format!("top: {}px; left: {}px", x, y);
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
