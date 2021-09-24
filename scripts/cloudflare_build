@@ -1,5 +1,0 @@
-#!/bin/bash
-set -e
-
-docker run --rm -ti -u $(id -u "${USER}"):$(id -g "${USER}") -v "$(pwd)":/opt/build -w /opt/build rust:buster \
-  cargo install trunk wasm-bindgen-cli && rustup target add wasm32-unknown-unknown && trunk build --release
