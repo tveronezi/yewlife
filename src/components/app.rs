@@ -21,7 +21,7 @@ impl Component for App {
 
     fn view(&self) -> Html {
         html! {
-            <div class=classes!("app", "app-center")>
+            <div class=classes!("app")>
                 <Existence/>
             </div>
         }

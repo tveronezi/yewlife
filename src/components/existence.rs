@@ -1,5 +1,5 @@
-use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
 use crate::universe;
+use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
 
 pub enum Msg {
     Tick,
@@ -10,6 +10,19 @@ pub struct Existence {
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
     value: universe::Universe,
+}
+
+trait Renderable {
+    fn render(&self) -> Html;
+}
+
+impl Renderable for universe::Entity {
+    fn render(&self) -> Html {
+        html! {
+            <div class=classes!("app-entity")>
+            </div>
+        }
+    }
 }
 
 impl Component for Existence {
@@ -24,7 +37,10 @@ impl Component for Existence {
 111
         "#,
         );
-        Self { link, value: universe }
+        Self {
+            link,
+            value: universe,
+        }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
@@ -46,13 +62,16 @@ impl Component for Existence {
     }
 
     fn view(&self) -> Html {
-        let universe = format!("{:?}", self.value);
+        log::info!("{:?}", self.value);
+        let mut entities = self
+            .value
+            .entities
+            .iter()
+            .map(|e| e.render())
+            .collect::<Html>();
         html! {
-            <div class=classes!("app-center", "card-panel")>
-                <a onclick=self.link.callback(|_| Msg::Tick) class="btn-floating btn-large waves-effect waves-light red"><i class="material-icons">{ "add" }</i></a>
-                <p>
-                    <span class="blue-text text-darken-2">{ universe }</span>
-                </p>
+            <div class=classes!("app-existence")>
+                 { entities }
             </div>
         }
     }

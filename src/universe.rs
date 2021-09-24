@@ -3,9 +3,9 @@ use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
 
 #[derive(Eq, PartialEq, Debug, Clone)]
-pub(crate) struct Entity {
-    line: i64,
-    column: i64,
+pub struct Entity {
+    pub line: i64,
+    pub column: i64,
 }
 
 impl Ord for Entity {
@@ -25,13 +25,17 @@ impl PartialOrd for Entity {
 }
 
 #[derive(Eq, PartialEq, Debug)]
-pub(crate) struct Universe {
-    entities: BTreeSet<Entity>,
+pub struct Universe {
+    pub entities: BTreeSet<Entity>,
 }
 
 impl Display for Universe {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "Universe {:?}", self.entities.iter().cloned().collect::<Vec<Entity>>())
+        write!(
+            f,
+            "Universe {:?}",
+            self.entities.iter().cloned().collect::<Vec<Entity>>()
+        )
     }
 }
 
