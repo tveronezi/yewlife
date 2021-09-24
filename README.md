@@ -1,6 +1,6 @@
-# Conway's game of life with yew.rs
+# yewlife 
 
-Playing with `yew.rs`.
+Conway's game of life with https://yew.rs
 
 ## Dependencies
 
