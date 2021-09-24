@@ -1,6 +1,8 @@
+use crate::components::bean::Bean;
 use crate::universe;
 use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
 
+#[derive(Debug)]
 pub enum Msg {
     Tick,
 }
@@ -10,19 +12,6 @@ pub struct Existence {
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
     value: universe::Universe,
-}
-
-trait Renderable {
-    fn render(&self) -> Html;
-}
-
-impl Renderable for universe::Entity {
-    fn render(&self) -> Html {
-        html! {
-            <div class=classes!("app-entity")>
-            </div>
-        }
-    }
 }
 
 impl Component for Existence {
@@ -37,6 +26,7 @@ impl Component for Existence {
 111
         "#,
         );
+        log::info!("[create]: {:?}", universe);
         Self {
             link,
             value: universe,
@@ -44,11 +34,11 @@ impl Component for Existence {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
+        log::info!("[update]: {:?}", msg);
         match msg {
             Msg::Tick => {
                 self.value.tick();
-                // the value has changed so we need to
-                // re-render for it to appear on the page
+                log::info!("[update]: re-render");
                 true
             }
         }
@@ -58,20 +48,32 @@ impl Component for Existence {
         // Should only return "true" if new properties are different to
         // previously received properties.
         // This component has no properties so we will always return "false".
+        log::info!("[change]: {:?}", self.value);
         false
     }
 
     fn view(&self) -> Html {
-        log::info!("{:?}", self.value);
-        let mut entities = self
+        log::info!("[view]: {:?}", self.value);
+        let entities = self
             .value
             .entities
             .iter()
-            .map(|e| e.render())
+            .map(|e| {
+                html! {
+                    <Bean value={e.clone()} />
+                }
+            })
             .collect::<Html>();
         html! {
             <div class=classes!("app-existence")>
-                 { entities }
+                <div class="app-tick">
+                    <a  onclick=self.link.callback(|_| Msg::Tick)
+                        class="btn-floating btn-large waves-effect waves-light red"
+                    >
+                        <i class="material-icons">{ "add" }</i>
+                    </a>
+                </div>
+                { entities }
             </div>
         }
     }

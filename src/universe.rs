@@ -115,8 +115,7 @@ impl Universe {
         .iter()
         .map(|c| c.is_some())
         .filter(|c| *c)
-        .collect::<Vec<bool>>()
-        .len()
+        .count()
     }
 
     pub fn tick(&mut self) {
@@ -139,10 +138,8 @@ impl Universe {
                     if neighbors == 3 {
                         new_entities.insert(this_cell);
                     }
-                } else {
-                    if neighbors == 3 || neighbors == 2 {
-                        new_entities.insert(this_cell);
-                    }
+                } else if neighbors == 3 || neighbors == 2 {
+                    new_entities.insert(this_cell);
                 }
             }
         }

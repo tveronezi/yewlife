@@ -4,4 +4,4 @@ set -e
 TARGET_VERSION=$(cargo pkgid | cut -d# -f2 | cut -d: -f2)
 
 # Create docker image
-docker build . --file Dockerfile --tag yewapp:"$TARGET_VERSION" --tag yewapp:latest
+docker build . --file Dockerfile --tag yewlife:"$TARGET_VERSION" --tag yewlife:latest
