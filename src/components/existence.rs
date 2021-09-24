@@ -1,10 +1,13 @@
 use crate::components::bean::Bean;
 use crate::universe;
+use gloo::timers::callback::Interval;
 use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
     Tick,
+    Play,
+    Pause,
     AddEntity(MouseEvent),
 }
 
@@ -13,6 +16,7 @@ pub struct Existence {
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
     value: universe::Universe,
+    timer: Option<Interval>,
 }
 
 impl Existence {
@@ -42,6 +46,7 @@ impl Component for Existence {
         Self {
             link,
             value: universe,
+            timer: None,
         }
     }
 
@@ -55,6 +60,15 @@ impl Component for Existence {
                 let x = event.x();
                 let y = event.y();
                 self.add_entity(x, y);
+                true
+            }
+            Msg::Play => {
+                let this_link = self.link.clone();
+                self.timer = Some(Interval::new(1, move || this_link.send_message(Msg::Tick)));
+                true
+            }
+            Msg::Pause => {
+                self.timer = None;
                 true
             }
         }
@@ -99,8 +113,18 @@ impl Component for Existence {
                 }
             })
             .collect::<Html>();
-        let on_tick_click = self.link.callback(|_| Msg::Tick);
+        let running = self.timer.is_some();
+        let on_tick_click = self.link.callback(move |_| {
+            if running {
+                return Msg::Pause;
+            }
+            Msg::Play
+        });
         let on_existence_click = self.link.callback(Msg::AddEntity);
+        let icon = match self.timer {
+            None => "play_arrow",
+            Some(_) => "pause",
+        };
         html! {
             <div onmousedown={on_existence_click} class=classes!("app-existence")>
                 { entities }
@@ -108,7 +132,7 @@ impl Component for Existence {
                     <a  onclick={on_tick_click}
                         class="btn-floating btn-large waves-effect waves-light red"
                     >
-                        <i class="material-icons">{ "add" }</i>
+                        <i class="material-icons">{ icon }</i>
                     </a>
                 </div>
             </div>
