@@ -1,4 +1,4 @@
-use crate::components::bean::Bean;
+use crate::components::bean::{Bean, CallbackMsg};
 use crate::universe;
 use gloo::timers::callback::Interval;
 use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
@@ -9,6 +9,7 @@ pub enum Msg {
     Play,
     Pause,
     AddEntity(MouseEvent),
+    EntityCallback(crate::components::bean::CallbackMsg),
 }
 
 pub struct Existence {
@@ -71,6 +72,9 @@ impl Component for Existence {
                 self.timer = None;
                 true
             }
+            Msg::EntityCallback(msg) => match msg {
+                CallbackMsg::Die(entity) => self.value.entities.remove(&entity), // if true, it will rerender
+            },
         }
     }
 
@@ -108,8 +112,9 @@ impl Component for Existence {
                 true
             })
             .map(|e| {
+                let onchange = self.link.callback(Msg::EntityCallback);
                 html! {
-                    <Bean value={e.clone()} />
+                    <Bean value={e.clone()} onchange={ onchange } />
                 }
             })
             .collect::<Html>();

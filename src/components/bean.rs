@@ -1,14 +1,20 @@
 use crate::universe;
-use yew::{classes, html, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{classes, html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
     Die,
 }
 
+#[derive(Debug)]
+pub enum CallbackMsg {
+    Die(universe::Entity),
+}
+
 #[derive(Clone, Properties)]
 pub struct Props {
     pub value: universe::Entity,
+    pub onchange: Callback<CallbackMsg>,
 }
 
 pub struct Bean {
@@ -16,6 +22,7 @@ pub struct Bean {
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
     value: universe::Entity,
+    onchange: Callback<CallbackMsg>,
 }
 
 impl Component for Bean {
@@ -26,13 +33,14 @@ impl Component for Bean {
         Self {
             link,
             value: props.value,
+            onchange: props.onchange,
         }
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Die => {
-                // TODO: remove the element here
+                self.onchange.emit(CallbackMsg::Die(self.value.clone()));
                 true
             }
         }
