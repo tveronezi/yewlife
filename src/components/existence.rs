@@ -23,16 +23,14 @@ pub struct Existence {
     timer: Option<Interval>,
 }
 
-impl Existence {
-    fn add_entity(&mut self, x: i32, y: i32) {
-        let column = x / (universe::CELL_SIZE as i32);
-        let line = y / (universe::CELL_SIZE as i32);
-        let entity = universe::Entity {
-            line: line as i64,
-            column: column as i64,
-        };
-        self.value.entities.insert(entity);
-    }
+fn add_entity(universe: &mut universe::Universe, x: i32, y: i32) {
+    let column = x / (universe::CELL_SIZE as i32);
+    let line = y / (universe::CELL_SIZE as i32);
+    let entity = universe::Entity {
+        line: line as i64,
+        column: column as i64,
+    };
+    universe.entities.insert(entity);
 }
 
 pub fn is_visible(e: &universe::Entity) -> bool {
@@ -70,18 +68,30 @@ fn window_dimensions() -> Dimensions {
     Dimensions { height, width }
 }
 
+fn random_universe(universe: &mut universe::Universe) {
+    universe.entities.clear();
+    let window = window_dimensions();
+    for y in 0..(window.height / (universe::CELL_SIZE as i64)) {
+        for x in 0..(window.width / (universe::CELL_SIZE as i64)) {
+            let number = random().round() as i64;
+            if number % 7 == 0 {
+                add_entity(
+                    universe,
+                    (x * (universe::CELL_SIZE as i64)) as i32,
+                    (y * (universe::CELL_SIZE as i64)) as i32,
+                )
+            }
+        }
+    }
+}
+
 impl Component for Existence {
     type Message = Msg;
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let universe = universe::Universe::new(
-            r#"
-010
-001
-111
-        "#,
-        );
+        let mut universe = universe::Universe::new(include_str!("init_pattern.txt"));
+        random_universe(&mut universe);
         Self {
             link,
             value: universe,
@@ -98,7 +108,7 @@ impl Component for Existence {
             Msg::AddEntity(event) => {
                 let x = event.x();
                 let y = event.y();
-                self.add_entity(x, y);
+                add_entity(&mut self.value, x, y);
                 true
             }
             Msg::TickClick => {
@@ -116,19 +126,7 @@ impl Component for Existence {
             },
             Msg::Shuffle => {
                 self.timer = None;
-                self.value.entities.clear();
-                let window = window_dimensions();
-                for y in 0..(window.height / (universe::CELL_SIZE as i64)) {
-                    for x in 0..(window.width / (universe::CELL_SIZE as i64)) {
-                        let number = random().round() as i64;
-                        if number % 7 == 0 {
-                            self.add_entity(
-                                (x * (universe::CELL_SIZE as i64)) as i32,
-                                (y * (universe::CELL_SIZE as i64)) as i32,
-                            )
-                        }
-                    }
-                }
+                random_universe(&mut self.value);
                 true
             }
         }
@@ -158,7 +156,7 @@ impl Component for Existence {
             None => ("play_arrow", true),
             Some(_) => ("pause", false),
         };
-        let universe = self.value.clone();
+        let universe = self.value.clone(); // yeah... lazy.
         html! {
             <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }

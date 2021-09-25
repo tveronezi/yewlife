@@ -1,5 +1,5 @@
 use crate::universe;
-use yew::{classes, html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
@@ -60,7 +60,8 @@ impl Component for Bean {
         let style = format!("top: {}px; left: {}px", x, y);
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
-            <div onclick={onclick} class=classes!("app-entity", "red", "darken-1") style={ style }>
+            <div onclick={onclick} class="app-entity" style={ style }>
+                <div class="red lighten-2"/>
             </div>
         }
     }
