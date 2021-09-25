@@ -133,6 +133,7 @@ impl Component for Existence {
                 true
             }
             Msg::Clear => {
+                self.timer = None;
                 self.value.entities.clear();
                 true
             }
