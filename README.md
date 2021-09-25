@@ -2,6 +2,8 @@
 
 Conway's game of life with https://yew.rs
 
+Demo here https://yewlife.tveronezi.workers.dev/
+
 ## Dependencies
 
 * `cargo 1.54.0 (5ae8d74b3 2021-06-22)`
@@ -17,7 +19,3 @@ trunk serve
 ```
 
 Now open http://localhost:8080/
-
-## Demo
-
-Here https://yewlife.tveronezi.workers.dev/
