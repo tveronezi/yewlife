@@ -34,11 +34,11 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install trunk
-        run: cargo install --locked trunk
+        run: cargo install --locked trunk || true
       - name: Install wasm-bindgen-cli
-        run: cargo install --locked wasm-bindgen-cli
+        run: cargo install --locked wasm-bindgen-cli || true
       - name: Add wasm32-unknown-unknown target
-        run: rustup target add wasm32-unknown-unknown
+        run: rustup target add wasm32-unknown-unknown || true
       - name: Build application binary
         run: ./scripts/ci_app
       - name: Build docker image
