@@ -127,12 +127,8 @@ impl Component for Existence {
         });
         let on_existence_click = self.link.callback(Msg::AddEntity);
         let (icon, pulse, waves_effect) = match self.timer {
-            None => {
-                ("play_arrow", Some("pulse"), None)
-            },
-            Some(_) => {
-                ("pause", None, Some("waves-effect"))
-            },
+            None => ("play_arrow", Some("pulse"), None),
+            Some(_) => ("pause", None, Some("waves-effect")),
         };
         html! {
             <div onmousedown={on_existence_click} class=classes!("app-existence")>
