@@ -26,7 +26,7 @@ impl PartialOrd for Entity {
     }
 }
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Universe {
     pub entities: BTreeSet<Entity>,
 }

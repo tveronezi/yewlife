@@ -11,15 +11,22 @@ html, body
   height: 100%
   position: relative
   overflow: hidden
-  background-color: #000000
 
 .app-entity
   position: absolute
   height: 10px
   width: 10px
-  background-color: #ff0000
 
 .app-tick
   position: absolute
   bottom: 20px
   right: 20px
+
+.app-score
+  position: absolute
+  top: 20px
+  right: 20px
+  width: 200px
+  > div
+    background-color: transparentize(#546e7a, .5)
+    user-select: none

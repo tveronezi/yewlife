@@ -1,4 +1,5 @@
 use crate::components::bean::{Bean, CallbackMsg};
+use crate::components::score::Score;
 use crate::universe;
 use gloo::timers::callback::Interval;
 use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
@@ -29,6 +30,44 @@ impl Existence {
             column: column as i64,
         };
         self.value.entities.insert(entity);
+    }
+}
+
+pub fn is_visible(e: &universe::Entity) -> bool {
+    if e.column < 0 || e.line < 0 {
+        return false;
+    }
+    let window = window_dimensions();
+    if e.column * (universe::CELL_SIZE as i64) > window.width
+        || e.line * (universe::CELL_SIZE as i64) > window.height
+    {
+        return false;
+    }
+    true
+}
+
+struct Dimensions {
+    height: i64,
+    width: i64,
+}
+
+fn window_dimensions() -> Dimensions {
+    let window: web_sys::Window = utils::window();
+    let height = window
+        .inner_height()
+        .expect("Unable to load window height")
+        .as_f64()
+        .expect("height is not a number")
+        .round() as i64;
+    let width = window
+        .inner_width()
+        .expect("Unable to load window width")
+        .as_f64()
+        .expect("width is not a number")
+        .round() as i64;
+    Dimensions {
+        height,
+        width
     }
 }
 
@@ -83,34 +122,11 @@ impl Component for Existence {
     }
 
     fn view(&self) -> Html {
-        let window: web_sys::Window = utils::window();
-        let window_height = window
-            .inner_height()
-            .expect("Unable to load window height")
-            .as_f64()
-            .expect("height is not a number")
-            .round() as i64;
-        let window_width = window
-            .inner_width()
-            .expect("Unable to load window width")
-            .as_f64()
-            .expect("width is not a number")
-            .round() as i64;
         let entities = self
             .value
             .entities
             .iter()
-            .filter(|e| {
-                if e.column < 0 || e.line < 0 {
-                    return false;
-                }
-                if e.column * (universe::CELL_SIZE as i64) > window_width
-                    || e.line * (universe::CELL_SIZE as i64) > window_height
-                {
-                    return false;
-                }
-                true
-            })
+            .filter(|e| is_visible(*e))
             .map(|e| {
                 let onchange = self.link.callback(Msg::EntityCallback);
                 html! {
@@ -130,8 +146,9 @@ impl Component for Existence {
             None => ("play_arrow", Some("pulse"), None),
             Some(_) => ("pause", None, Some("waves-effect")),
         };
+        let universe = self.value.clone();
         html! {
-            <div onmousedown={on_existence_click} class=classes!("app-existence")>
+            <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }
                 <div class="app-tick">
                     <a  onclick={on_tick_click}
@@ -140,6 +157,7 @@ impl Component for Existence {
                         <i class="material-icons">{ icon }</i>
                     </a>
                 </div>
+                <Score universe={ universe }/>
             </div>
         }
     }

@@ -60,7 +60,7 @@ impl Component for Bean {
         let style = format!("top: {}px; left: {}px", x, y);
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
-            <div onclick={onclick} class=classes!("app-entity") style={ style }>
+            <div onclick={onclick} class=classes!("app-entity", "red", "darken-1") style={ style }>
             </div>
         }
     }
