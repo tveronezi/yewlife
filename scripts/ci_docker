@@ -1,8 +1,6 @@
 #!/bin/bash
 set -e
 
-rm -Rf .wrangler # docker was complaining about this guy.
-
 TARGET_VERSION=$(cargo pkgid | cut -d# -f2 | cut -d: -f2)
 
 # Create docker image
