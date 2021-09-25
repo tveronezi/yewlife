@@ -11,6 +11,7 @@ pub enum Msg {
     Tick,
     TickClick,
     Shuffle,
+    Clear,
     AddEntity(MouseEvent),
     EntityCallback(crate::components::bean::CallbackMsg),
 }
@@ -83,6 +84,7 @@ fn random_universe(universe: &mut universe::Universe) {
             }
         }
     }
+    universe.tick();
 }
 
 impl Component for Existence {
@@ -91,7 +93,6 @@ impl Component for Existence {
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let mut universe = universe::Universe::new(include_str!("init_pattern.txt"));
-        random_universe(&mut universe);
         universe.tick();
         Self {
             link,
@@ -130,6 +131,10 @@ impl Component for Existence {
                 random_universe(&mut self.value);
                 true
             }
+            Msg::Clear => {
+                self.value.entities.clear();
+                true
+            }
         }
     }
 
@@ -152,6 +157,7 @@ impl Component for Existence {
             .collect::<Html>();
         let on_tick_click = self.link.callback(|_| Msg::TickClick);
         let on_shuffle_click = self.link.callback(|_| Msg::Shuffle);
+        let on_clear_click = self.link.callback(|_| Msg::Clear);
         let on_existence_click = self.link.callback(Msg::AddEntity);
         let (icon, pulse) = match self.timer {
             None => ("play_arrow", true),
@@ -162,6 +168,9 @@ impl Component for Existence {
             <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }
                 <div class="app-buttons">
+                    <div class="app-clear">
+                        <ActionButton icon={"clear"} pulse={false} onclick={on_clear_click} />
+                    </div>
                     <div class="app-random">
                         <ActionButton icon={"shuffle"} pulse={false} onclick={on_shuffle_click} />
                     </div>
