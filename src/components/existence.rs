@@ -92,6 +92,7 @@ impl Component for Existence {
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
         let mut universe = universe::Universe::new(include_str!("init_pattern.txt"));
         random_universe(&mut universe);
+        universe.tick();
         Self {
             link,
             value: universe,
