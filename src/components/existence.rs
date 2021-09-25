@@ -1,4 +1,5 @@
 use crate::components::bean::{Bean, CallbackMsg};
+use crate::components::button::ActionButton;
 use crate::components::score::Score;
 use crate::universe;
 use gloo::timers::callback::Interval;
@@ -7,8 +8,7 @@ use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, Shou
 #[derive(Debug)]
 pub enum Msg {
     Tick,
-    Play,
-    Pause,
+    TickClick,
     AddEntity(MouseEvent),
     EntityCallback(crate::components::bean::CallbackMsg),
 }
@@ -99,13 +99,14 @@ impl Component for Existence {
                 self.add_entity(x, y);
                 true
             }
-            Msg::Play => {
-                let this_link = self.link.clone();
-                self.timer = Some(Interval::new(1, move || this_link.send_message(Msg::Tick)));
-                true
-            }
-            Msg::Pause => {
-                self.timer = None;
+            Msg::TickClick => {
+                self.timer = match &self.timer {
+                    None => {
+                        let this_link = self.link.clone();
+                        Some(Interval::new(1, move || this_link.send_message(Msg::Tick)))
+                    }
+                    Some(_) => None,
+                };
                 true
             }
             Msg::EntityCallback(msg) => match msg {
@@ -131,28 +132,18 @@ impl Component for Existence {
                 }
             })
             .collect::<Html>();
-        let running = self.timer.is_some();
-        let on_tick_click = self.link.callback(move |_| {
-            if running {
-                return Msg::Pause;
-            }
-            Msg::Play
-        });
+        let on_tick_click = self.link.callback(|_| Msg::TickClick);
         let on_existence_click = self.link.callback(Msg::AddEntity);
-        let (icon, pulse, waves_effect) = match self.timer {
-            None => ("play_arrow", Some("pulse"), None),
-            Some(_) => ("pause", None, Some("waves-effect")),
+        let (icon, pulse) = match self.timer {
+            None => ("play_arrow", true),
+            Some(_) => ("pause", false),
         };
         let universe = self.value.clone();
         html! {
             <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }
                 <div class="app-tick">
-                    <a  onclick={on_tick_click}
-                        class=classes!("btn-floating", "btn-large", waves_effect, "waves-light", "red", pulse)
-                    >
-                        <i class="material-icons">{ icon }</i>
-                    </a>
+                    <ActionButton icon={icon} pulse={pulse} onclick={on_tick_click} />
                 </div>
                 <Score universe={ universe }/>
             </div>
