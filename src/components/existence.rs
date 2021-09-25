@@ -3,12 +3,14 @@ use crate::components::button::ActionButton;
 use crate::components::score::Score;
 use crate::universe;
 use gloo::timers::callback::Interval;
+use js_sys::Math::random;
 use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
     Tick,
     TickClick,
+    Shuffle,
     AddEntity(MouseEvent),
     EntityCallback(crate::components::bean::CallbackMsg),
 }
@@ -112,6 +114,23 @@ impl Component for Existence {
             Msg::EntityCallback(msg) => match msg {
                 CallbackMsg::Die(entity) => self.value.entities.remove(&entity), // if true, it will rerender
             },
+            Msg::Shuffle => {
+                self.timer = None;
+                self.value.entities.clear();
+                let window = window_dimensions();
+                for y in 0..(window.height / (universe::CELL_SIZE as i64)) {
+                    for x in 0..(window.width / (universe::CELL_SIZE as i64)) {
+                        let number = random().round() as i64;
+                        if number % 7 == 0 {
+                            self.add_entity(
+                                (x * (universe::CELL_SIZE as i64)) as i32,
+                                (y * (universe::CELL_SIZE as i64)) as i32,
+                            )
+                        }
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -133,6 +152,7 @@ impl Component for Existence {
             })
             .collect::<Html>();
         let on_tick_click = self.link.callback(|_| Msg::TickClick);
+        let on_shuffle_click = self.link.callback(|_| Msg::Shuffle);
         let on_existence_click = self.link.callback(Msg::AddEntity);
         let (icon, pulse) = match self.timer {
             None => ("play_arrow", true),
@@ -142,8 +162,13 @@ impl Component for Existence {
         html! {
             <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }
-                <div class="app-tick">
-                    <ActionButton icon={icon} pulse={pulse} onclick={on_tick_click} />
+                <div class="app-buttons">
+                    <div class="app-random">
+                        <ActionButton icon={"shuffle"} pulse={false} onclick={on_shuffle_click} />
+                    </div>
+                    <div class="app-tick">
+                        <ActionButton icon={icon} pulse={pulse} onclick={on_tick_click} />
+                    </div>
                 </div>
                 <Score universe={ universe }/>
             </div>
