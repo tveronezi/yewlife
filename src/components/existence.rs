@@ -65,10 +65,7 @@ fn window_dimensions() -> Dimensions {
         .as_f64()
         .expect("width is not a number")
         .round() as i64;
-    Dimensions {
-        height,
-        width
-    }
+    Dimensions { height, width }
 }
 
 impl Component for Existence {
