@@ -28,10 +28,9 @@ jobs:
       - uses: actions/cache@v2
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ github.ref }}
       - name: Install trunk
         run: cargo install --locked trunk
       - name: Install wasm-bindgen-cli
