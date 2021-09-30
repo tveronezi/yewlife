@@ -1,18 +1,18 @@
+use crate::components::actions::{self, Actions};
 use crate::components::bean::{Bean, CallbackMsg};
-use crate::components::button::ActionButton;
 use crate::components::score::Score;
 use crate::universe;
 use gloo::timers::callback::Interval;
 use js_sys::Math::random;
-use yew::{classes, html, utils, Component, ComponentLink, Html, MouseEvent, ShouldRender};
+use yew::{
+    classes, html, utils, web_sys, Component, ComponentLink, Html, MouseEvent, ShouldRender,
+};
 
 #[derive(Debug)]
 pub enum Msg {
     Tick,
-    TickClick,
-    Shuffle,
-    Clear,
-    AddEntity(MouseEvent),
+    Action(actions::Msg),
+    ExistenceClick(MouseEvent),
     EntityCallback(crate::components::bean::CallbackMsg),
 }
 
@@ -20,8 +20,15 @@ pub struct Existence {
     // `ComponentLink` is like a reference to a component.
     // It can be used to send messages to the component
     link: ComponentLink<Self>,
-    value: universe::Universe,
+    value: Box<universe::Universe>,
     timer: Option<Interval>,
+    state: State,
+}
+
+#[derive(Clone)]
+enum State {
+    Playing,
+    Paused,
 }
 
 fn add_entity(universe: &mut universe::Universe, x: i32, y: i32) {
@@ -97,8 +104,9 @@ impl Component for Existence {
         universe.tick();
         Self {
             link,
-            value: universe,
+            value: Box::new(universe),
             timer: None,
+            state: State::Paused,
         }
     }
 
@@ -108,35 +116,46 @@ impl Component for Existence {
                 self.value.tick();
                 true
             }
-            Msg::AddEntity(event) => {
+            Msg::ExistenceClick(event) => {
+                if event.target() != event.current_target() {
+                    return false;
+                }
                 let x = event.x();
                 let y = event.y();
                 add_entity(&mut self.value, x, y);
                 true
             }
-            Msg::TickClick => {
-                self.timer = match &self.timer {
-                    None => {
-                        let this_link = self.link.clone();
-                        Some(Interval::new(1, move || this_link.send_message(Msg::Tick)))
-                    }
-                    Some(_) => None,
-                };
-                true
-            }
             Msg::EntityCallback(msg) => match msg {
                 CallbackMsg::Die(entity) => self.value.entities.remove(&entity), // if true, it will rerender
             },
-            Msg::Shuffle => {
-                self.timer = None;
-                random_universe(&mut self.value);
-                true
-            }
-            Msg::Clear => {
-                self.timer = None;
-                self.value.entities.clear();
-                true
-            }
+            Msg::Action(message) => match message {
+                actions::Msg::PauseOrPlay => match self.state {
+                    State::Playing => {
+                        self.timer = None;
+                        self.state = State::Paused;
+                        true
+                    }
+                    State::Paused => {
+                        let link = self.link.clone();
+                        self.timer = Some(Interval::new(1, move || link.send_message(Msg::Tick)));
+                        self.state = State::Playing;
+                        true
+                    }
+                },
+                actions::Msg::Random => {
+                    self.timer = None;
+                    self.state = State::Paused;
+                    random_universe(&mut self.value);
+                    true
+                }
+                actions::Msg::Clear => {
+                    self.timer = None;
+                    self.state = State::Paused;
+                    self.value.entities.clear();
+                    true
+                }
+                actions::Msg::Settings => true,
+            },
         }
     }
 
@@ -157,29 +176,17 @@ impl Component for Existence {
                 }
             })
             .collect::<Html>();
-        let on_tick_click = self.link.callback(|_| Msg::TickClick);
-        let on_shuffle_click = self.link.callback(|_| Msg::Shuffle);
-        let on_clear_click = self.link.callback(|_| Msg::Clear);
-        let on_existence_click = self.link.callback(Msg::AddEntity);
-        let (icon, pulse) = match self.timer {
-            None => ("play_arrow", true),
-            Some(_) => ("pause", false),
+        let on_action_click = self.link.callback(Msg::Action);
+        let on_existence_click = self.link.callback(Msg::ExistenceClick);
+        let universe = self.value.clone();
+        let state = match self.state {
+            State::Playing => actions::State::Playing,
+            State::Paused => actions::State::Paused,
         };
-        let universe = self.value.clone(); // yeah... lazy.
         html! {
-            <div onmousedown={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
+            <div onclick={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
                 { entities }
-                <div class="app-buttons">
-                    <div class="app-clear">
-                        <ActionButton icon={"clear"} pulse={false} onclick={on_clear_click} />
-                    </div>
-                    <div class="app-random">
-                        <ActionButton icon={"shuffle"} pulse={false} onclick={on_shuffle_click} />
-                    </div>
-                    <div class="app-tick">
-                        <ActionButton icon={icon} pulse={pulse} onclick={on_tick_click} />
-                    </div>
-                </div>
+                <Actions onclick={ on_action_click } state={ state }/>
                 <Score universe={ universe }/>
             </div>
         }

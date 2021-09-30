@@ -3,11 +3,11 @@ use yew::{classes, html, Component, ComponentLink, Html, Properties, ShouldRende
 
 #[derive(Clone, Properties)]
 pub struct Props {
-    pub universe: universe::Universe,
+    pub universe: Box<universe::Universe>,
 }
 
 pub struct Score {
-    universe: universe::Universe,
+    universe: Box<universe::Universe>,
 }
 
 impl Component for Score {
