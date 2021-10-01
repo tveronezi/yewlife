@@ -80,7 +80,7 @@ impl Component for Actions {
     }
 
     fn view(&self) -> Html {
-        log::info!("actions");
+        log::debug!("view actions");
         let on_clear_click = self.link.callback(|_| Msg::Clear);
         let on_play_pause_click = self.link.callback(|event: MouseEvent| {
             event.stop_propagation();
