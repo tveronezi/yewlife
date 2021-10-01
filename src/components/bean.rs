@@ -53,7 +53,7 @@ impl Component for Bean {
     }
 
     fn view(&self) -> Html {
-        log::debug!("view bean");
+        log::info!("bean");
         let (x, y) = (
             self.value.line * universe::CELL_SIZE,
             self.value.column * universe::CELL_SIZE,

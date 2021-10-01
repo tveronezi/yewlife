@@ -64,7 +64,7 @@ impl Component for ActionButton {
     }
 
     fn view(&self) -> Html {
-        log::debug!("view button");
+        log::info!("button");
         let icon = self.icon.clone();
         let (pulse, waves_effect) = if self.pulse {
             (Some("pulse"), None)

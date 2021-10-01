@@ -48,39 +48,6 @@ struct Boundaries {
     column_min: i32,
 }
 
-impl Boundaries {
-    pub fn contains(&self, line: i32, column: i32) -> bool {
-        line > self.line_min
-            && line < self.line_max
-            && column > self.column_min
-            && column < self.column_max
-    }
-
-    pub fn padding(&self, padding: u32) -> Boundaries {
-        let padding = padding as i32;
-        Boundaries {
-            line_max: self.line_max + padding,
-            line_min: self.line_min - padding,
-            column_max: self.column_max + padding,
-            column_min: self.column_min - padding,
-        }
-    }
-}
-
-fn trim(boundaries: &Boundaries, entities: &BTreeSet<Entity>) -> BTreeSet<Entity> {
-    let result = entities
-        .iter()
-        .cloned()
-        .filter(|e| boundaries.contains(e.line, e.column))
-        .collect::<BTreeSet<Entity>>();
-    log::debug!(
-        "{} elements; {} removed",
-        result.len(),
-        entities.len() - result.len()
-    );
-    result
-}
-
 impl Universe {
     pub fn new(matrix: &str) -> Self {
         let mut universe = BTreeSet::new();
@@ -157,16 +124,15 @@ impl Universe {
         if self.entities.is_empty() {
             return;
         }
-        let boundaries = self.boundaries();
         let Boundaries {
-            line_max,
-            line_min,
-            column_max,
-            column_min,
-        } = &boundaries;
+            line_max: x_max,
+            line_min: x_min,
+            column_max: y_max,
+            column_min: y_min,
+        } = self.boundaries();
         let mut new_entities = BTreeSet::new();
-        for line in (line_min - 1)..(line_max + 2) {
-            for column in (column_min - 1)..(column_max + 2) {
+        for line in (x_min - 1)..(x_max + 2) {
+            for column in (y_min - 1)..(y_max + 2) {
                 let neighbors = self.number_of_neighbors(line, column);
                 let this_cell = Entity { line, column };
                 let exist = self.entities.get(&this_cell).is_some();
@@ -179,8 +145,7 @@ impl Universe {
                 }
             }
         }
-        // trim out all the elements outside this outer boundary of 10 lines/columns
-        self.entities = trim(&boundaries.padding(10), &new_entities);
+        self.entities = new_entities;
     }
 }
 

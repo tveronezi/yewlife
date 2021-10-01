@@ -20,7 +20,7 @@ impl Component for App {
     }
 
     fn view(&self) -> Html {
-        log::debug!("view app");
+        log::info!("app");
         html! {
             <div class=classes!("app")>
                 <Existence/>
