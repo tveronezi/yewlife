@@ -2,12 +2,12 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
 
-pub const CELL_SIZE: u8 = 10;
+pub const CELL_SIZE: i32 = 10;
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Entity {
-    pub line: i64,
-    pub column: i64,
+    pub line: i32,
+    pub column: i32,
 }
 
 impl Ord for Entity {
@@ -42,10 +42,10 @@ impl Display for Universe {
 }
 
 struct Boundaries {
-    line_max: i64,
-    line_min: i64,
-    column_max: i64,
-    column_min: i64,
+    line_max: i32,
+    line_min: i32,
+    column_max: i32,
+    column_min: i32,
 }
 
 impl Universe {
@@ -55,8 +55,8 @@ impl Universe {
             for (column, entry) in line_value.chars().enumerate() {
                 if entry == '1' {
                     universe.insert(Entity {
-                        line: line as i64,
-                        column: column as i64,
+                        line: line as i32,
+                        column: column as i32,
                     });
                 }
             }
@@ -65,10 +65,10 @@ impl Universe {
     }
 
     fn boundaries(&self) -> Boundaries {
-        let lines: BTreeSet<i64> = self.entities.iter().map(|cell| cell.line).collect();
+        let lines: BTreeSet<i32> = self.entities.iter().map(|cell| cell.line).collect();
         let line_max = *lines.iter().max().expect("empty collection?");
         let line_min = *lines.iter().min().expect("empty collection?");
-        let column: BTreeSet<i64> = self.entities.iter().map(|cell| cell.column).collect();
+        let column: BTreeSet<i32> = self.entities.iter().map(|cell| cell.column).collect();
         let column_max = *column.iter().max().expect("empty collection?");
         let column_min = *column.iter().min().expect("empty collection?");
         Boundaries {
@@ -79,7 +79,7 @@ impl Universe {
         }
     }
 
-    fn number_of_neighbors(&mut self, line: i64, column: i64) -> usize {
+    fn number_of_neighbors(&mut self, line: i32, column: i32) -> usize {
         vec![
             self.entities.get(&Entity {
                 line: line - 1,
