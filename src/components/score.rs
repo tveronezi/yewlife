@@ -31,6 +31,7 @@ impl Component for Score {
     }
 
     fn view(&self) -> Html {
+        log::info!("score");
         let elements = self.universe.entities.len();
         let visible = self
             .universe

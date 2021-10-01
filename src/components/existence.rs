@@ -4,9 +4,7 @@ use crate::components::score::Score;
 use crate::universe;
 use gloo::timers::callback::Interval;
 use js_sys::Math::random;
-use yew::{
-    classes, html, utils, web_sys, Component, ComponentLink, Html, MouseEvent, ShouldRender,
-};
+use yew::{html, utils, web_sys, Component, ComponentLink, Html, MouseEvent, ShouldRender};
 
 #[derive(Debug)]
 pub enum Msg {
@@ -32,12 +30,9 @@ enum State {
 }
 
 fn add_entity(universe: &mut universe::Universe, x: i32, y: i32) {
-    let column = x / (universe::CELL_SIZE as i32);
-    let line = y / (universe::CELL_SIZE as i32);
-    let entity = universe::Entity {
-        line: line as i64,
-        column: column as i64,
-    };
+    let column = x / universe::CELL_SIZE;
+    let line = y / universe::CELL_SIZE;
+    let entity = universe::Entity { line, column };
     universe.entities.insert(entity);
 }
 
@@ -46,17 +41,14 @@ pub fn is_visible(e: &universe::Entity) -> bool {
         return false;
     }
     let window = window_dimensions();
-    if e.column * (universe::CELL_SIZE as i64) > window.width
-        || e.line * (universe::CELL_SIZE as i64) > window.height
-    {
-        return false;
-    }
-    true
+    let outside_width = e.column * universe::CELL_SIZE > window.width;
+    let outside_height = e.line * universe::CELL_SIZE > window.height;
+    !(outside_height || outside_width)
 }
 
 struct Dimensions {
-    height: i64,
-    width: i64,
+    height: i32,
+    width: i32,
 }
 
 fn window_dimensions() -> Dimensions {
@@ -66,28 +58,26 @@ fn window_dimensions() -> Dimensions {
         .expect("Unable to load window height")
         .as_f64()
         .expect("height is not a number")
-        .round() as i64;
+        .round() as i32;
     let width = window
         .inner_width()
         .expect("Unable to load window width")
         .as_f64()
         .expect("width is not a number")
-        .round() as i64;
+        .round() as i32;
     Dimensions { height, width }
 }
 
 fn random_universe(universe: &mut universe::Universe) {
     universe.entities.clear();
     let window = window_dimensions();
-    for y in 0..(window.height / (universe::CELL_SIZE as i64)) {
-        for x in 0..(window.width / (universe::CELL_SIZE as i64)) {
+    let max_y = window.height / universe::CELL_SIZE;
+    let max_x = window.width / universe::CELL_SIZE;
+    for y in 0..max_y {
+        for x in 0..max_x {
             let number = random().round() as i64;
             if number % 7 == 0 {
-                add_entity(
-                    universe,
-                    (x * (universe::CELL_SIZE as i64)) as i32,
-                    (y * (universe::CELL_SIZE as i64)) as i32,
-                )
+                add_entity(universe, x * universe::CELL_SIZE, y * universe::CELL_SIZE)
             }
         }
     }
@@ -99,7 +89,7 @@ impl Component for Existence {
     type Properties = ();
 
     fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        let mut universe = universe::Universe::new(include_str!("init_pattern.txt"));
+        let mut universe = universe::Universe::new("");
         random_universe(&mut universe);
         universe.tick();
         Self {
@@ -137,7 +127,7 @@ impl Component for Existence {
                     }
                     State::Paused => {
                         let link = self.link.clone();
-                        self.timer = Some(Interval::new(1, move || link.send_message(Msg::Tick)));
+                        self.timer = Some(Interval::new(0, move || link.send_message(Msg::Tick)));
                         self.state = State::Playing;
                         true
                     }
@@ -164,6 +154,7 @@ impl Component for Existence {
     }
 
     fn view(&self) -> Html {
+        log::info!("existence");
         let entities = self
             .value
             .entities
@@ -184,7 +175,7 @@ impl Component for Existence {
             State::Paused => actions::State::Paused,
         };
         html! {
-            <div onclick={on_existence_click} class=classes!("app-existence", "grey", "darken-4")>
+            <div onclick={on_existence_click} class="app-existence grey darken-4">
                 { entities }
                 <Actions onclick={ on_action_click } state={ state }/>
                 <Score universe={ universe }/>

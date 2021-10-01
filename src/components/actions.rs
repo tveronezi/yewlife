@@ -50,8 +50,6 @@ impl Component for Actions {
     }
 
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        if let Msg::PauseOrPlay = msg {}
-        if let Msg::Settings = msg {}
         match msg {
             Msg::PauseOrPlay => {
                 self.state = match self.state {
@@ -82,6 +80,7 @@ impl Component for Actions {
     }
 
     fn view(&self) -> Html {
+        log::info!("actions");
         let on_clear_click = self.link.callback(|_| Msg::Clear);
         let on_play_pause_click = self.link.callback(|event: MouseEvent| {
             event.stop_propagation();
