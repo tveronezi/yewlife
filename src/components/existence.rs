@@ -154,7 +154,7 @@ impl Component for Existence {
     }
 
     fn view(&self) -> Html {
-        log::info!("existence");
+        log::debug!("view existence");
         let entities = self
             .value
             .entities
