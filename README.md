@@ -30,7 +30,7 @@ npm install -D tailwindcss
 Terminal one:
 
 ```
-npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
+npx tailwindcss -i ./tailwind-input.css -o ./tailwind.css --watch
 ```
 
 Terminal two:
