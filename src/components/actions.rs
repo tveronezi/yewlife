@@ -97,7 +97,7 @@ impl Component for Actions {
             SettingsState::Closed => "scale-transition scale-out".to_string(),
         };
         html! {
-            <div class="app-buttons">
+            <div class="bg-yellow-400 fixed bottom-4 right-4 flex justify-items-end">
                 <div class="app-actions">
                     <ActionButton size={ Size::Small } icon={ "delete" } pulse={ false } onclick={ on_clear_click } class={ children_hidden.clone() }  />
                     <ActionButton size={ Size::Small } icon={ "shuffle" } pulse={ false } onclick={ on_shuffle_click } class={ children_hidden }  />

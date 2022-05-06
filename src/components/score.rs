@@ -40,23 +40,19 @@ impl Component for Score {
             .filter(|e| crate::components::existence::is_visible(*e))
             .count();
         html! {
-            <div class=classes!("app-score")>
-                <div class=classes!("card")>
-                    <div class="card-content white-text">
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th>{"Elements"}</th>
-                                <td>{ elements }</td>
-                            </tr>
-                            <tr>
-                                <th>{"Visible"}</th>
-                                <td>{ visible }</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class=classes!("fixed", "top-4", "right-4", "bg-cyan-800", "p-4", "rounded-lg")>
+                <table class=classes!("table-auto")>
+                    <tbody>
+                    <tr>
+                        <th class=classes!("text-white", "text-sm", "p-1")>{"Elements"}</th>
+                        <td class=classes!("text-white", "text-xs", "p-1")>{ elements }</td>
+                    </tr>
+                    <tr>
+                        <th class=classes!("text-white", "text-sm", "p-1")>{"Visible"}</th>
+                        <td class=classes!("text-white", "text-xs", "p-1")>{ visible }</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         }
     }

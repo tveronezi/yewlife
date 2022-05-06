@@ -175,7 +175,7 @@ impl Component for Existence {
             State::Paused => actions::State::Paused,
         };
         html! {
-            <div onclick={on_existence_click} class="app-existence grey darken-4">
+            <div onclick={on_existence_click} class="app-existence bg-black">
                 { entities }
                 <Actions onclick={ on_action_click } state={ state }/>
                 <Score universe={ universe }/>

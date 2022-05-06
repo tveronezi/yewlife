@@ -6,13 +6,34 @@ Demo here https://yewlife.tveronezi.workers.dev/
 
 ## Dependencies
 
-* `cargo 1.54.0 (5ae8d74b3 2021-06-22)`
-* `cargo install trunk wasm-bindgen-cli`
-* `rustup target add wasm32-unknown-unknown`
-* `Docker version 20.10.8, build 3967b7d`
+Runtime:
+```shell
+user:~$ cargo version
+cargo 1.60.0 (d1fd9fe 2022-03-01)
 
+user:~$ docker --version
+Docker version 20.10.14, build a224086
 
-## How to run it?
+user:~$ npm --version
+8.3.1
+```
+
+One-time commands:
+```shell
+cargo install trunk wasm-bindgen-cli
+rustup target add wasm32-unknown-unknown
+npm install -D tailwindcss
+```
+
+## How to run it in development mode?
+
+Terminal one:
+
+```
+npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch
+```
+
+Terminal two:
 
 ```shell script
 trunk serve

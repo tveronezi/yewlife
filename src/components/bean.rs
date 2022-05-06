@@ -53,7 +53,6 @@ impl Component for Bean {
     }
 
     fn view(&self) -> Html {
-        log::info!("bean");
         let (x, y) = (
             self.value.line * universe::CELL_SIZE,
             self.value.column * universe::CELL_SIZE,
@@ -61,7 +60,7 @@ impl Component for Bean {
         let style = format!("top: {}px; left: {}px", x, y);
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
-            <div onclick={onclick} class="app-entity red lighten-2" style={ style }/>
+            <div onclick={onclick} class="app-entity bg-red-700" style={ style }/>
         }
     }
 }
