@@ -1,5 +1,5 @@
 use crate::components::existence::Existence;
-use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
+use yew::{html, Component, ComponentLink, Html, ShouldRender};
 
 pub struct App();
 

@@ -81,12 +81,12 @@ impl Component for Actions {
 
     fn view(&self) -> Html {
         let on_clear_click = self.link.callback(|_| Msg::Clear);
-        let on_play_pause_click = self.link.callback(|event: MouseEvent| {
-            event.stop_propagation();
-            Msg::PauseOrPlay
-        });
+        let on_play_pause_click = self.link.callback(|_| Msg::PauseOrPlay);
         let on_shuffle_click = self.link.callback(|_| Msg::Random);
-        let on_settings_click = self.link.callback(|_| Msg::Settings);
+        let on_settings_click = self.link.callback(|e: MouseEvent| {
+            e.cancel_bubble();
+            Msg::Settings
+        });
         let (icon, pulse) = match self.state {
             State::Paused => ("play_arrow", true),
             State::Playing => ("pause", false),
@@ -98,22 +98,22 @@ impl Component for Actions {
         html! {
             <div class="bg-yellow-900/90 p-4 fixed bottom-4 right-4 rounded-lg">
                 <div class="flex items-center">
-                    <a onclick={ on_settings_click } class="bg-yellow-600 rounded-full relative">
+                    <button onclick={ on_settings_click } class="bg-yellow-600 rounded-full relative">
                         <div class={format!("absolute top-0 left-0 w-full h-full grid place-content-center -translate-y-[190%] ease-in-out duration-300 {}", children_hidden)}>
-                            <a onclick={ on_clear_click } class="bg-yellow-600 rounded-full p-2">
+                            <button onclick={ on_clear_click } class="bg-yellow-600 rounded-full p-2">
                                 <Delete svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                            </a>
+                            </button>
                         </div>
                         <div class={format!("absolute top-0 left-0 w-full h-full grid place-content-center -translate-y-[100%] ease-in-out duration-300 {}",  children_hidden)}>
-                            <a onclick={ on_shuffle_click } class="bg-yellow-600 rounded-full p-2">
+                            <button onclick={ on_shuffle_click } class="bg-yellow-600 rounded-full p-2">
                                 <Refresh svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                            </a>
+                            </button>
                         </div>
                         <Gear svg_class={"h-14 w-14 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                    </a>
-                    <a onclick={ on_play_pause_click }>
+                    </button>
+                    <button onclick={ on_play_pause_click }>
                         <Play svg_class={"h-14 w-14 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                    </a>
+                    </button>
                 </div>
             </div>
         }
