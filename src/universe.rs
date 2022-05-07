@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
 
-pub const CELL_SIZE: i32 = 10;
+pub const CELL_SIZE: i32 = 20;
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Entity {

@@ -1,4 +1,4 @@
-use crate::components::button::{ActionButton, Size};
+use crate::components::icons::{Delete, Gear, Play, Refresh};
 use yew::{html, Callback, Component, ComponentLink, Html, MouseEvent, Properties, ShouldRender};
 
 #[derive(Debug)]
@@ -96,15 +96,24 @@ impl Component for Actions {
             SettingsState::Open => "scale-transition".to_string(),
             SettingsState::Closed => "scale-transition scale-out".to_string(),
         };
+
         html! {
-            <div class="bg-yellow-400 fixed bottom-4 right-4 flex justify-items-end">
+            <div class="bg-cyan-800/80 fixed bottom-4 right-4 flex items-end rounded-lg p-4">
                 <div class="app-actions">
-                    <ActionButton size={ Size::Small } icon={ "delete" } pulse={ false } onclick={ on_clear_click } class={ children_hidden.clone() }  />
-                    <ActionButton size={ Size::Small } icon={ "shuffle" } pulse={ false } onclick={ on_shuffle_click } class={ children_hidden }  />
-                    <ActionButton size={ Size::Large } icon={ "settings" } pulse={ false } onclick={ on_settings_click } />
+                    <a onclick={ on_clear_click }>
+                        <Delete svg_class={"h-6 w-6 stroke-black".to_string()} path_class={"fill-transparent".to_string()} />
+                    </a>
+                    <a onclick={ on_shuffle_click }>
+                        <Refresh svg_class={"h-6 w-6 stroke-black".to_string()} path_class={"fill-transparent".to_string()} />
+                    </a>
+                    <a onclick={ on_settings_click }>
+                        <Gear svg_class={"h-14 w-14 stroke-black".to_string()} path_class={"fill-transparent".to_string()} />
+                    </a>
                 </div>
                 <div class="app-tick">
-                    <ActionButton size={ Size::Large } icon={ icon } pulse={ pulse } onclick={ on_play_pause_click } />
+                    <a onclick={ on_play_pause_click }>
+                        <Play svg_class={"h-14 w-14 stroke-black fill-black".to_string()} path_class={"fill-transparent".to_string()} />
+                    </a>
                 </div>
             </div>
         }

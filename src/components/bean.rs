@@ -1,4 +1,5 @@
 use crate::universe;
+use crate::universe::CELL_SIZE;
 use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
 
 #[derive(Debug)]
@@ -53,14 +54,26 @@ impl Component for Bean {
     }
 
     fn view(&self) -> Html {
-        let (x, y) = (
-            self.value.line * universe::CELL_SIZE,
-            self.value.column * universe::CELL_SIZE,
+        let (x, y) = (self.value.line * CELL_SIZE, self.value.column * CELL_SIZE);
+        let style = format!(
+            "top: {}px; left: {}px; height: {}px; width: {}px",
+            x, y, CELL_SIZE, CELL_SIZE
         );
-        let style = format!("top: {}px; left: {}px", x, y);
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
-            <div onclick={onclick} class="app-entity bg-red-700" style={ style }/>
+            <div onclick={onclick} class="absolute bg-red-400 bg-red-700" style={ style }/>
         }
     }
 }
+
+/*
+.app-entity
+  position: absolute
+  height: 10px
+  width: 10px
+  border: solid 1px #212121
+  > div
+    width: 100%
+    height: 100%
+
+ */

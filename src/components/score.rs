@@ -40,7 +40,7 @@ impl Component for Score {
             .filter(|e| crate::components::existence::is_visible(*e))
             .count();
         html! {
-            <div class=classes!("fixed", "top-4", "right-4", "bg-cyan-800", "p-4", "rounded-lg")>
+            <div class="fixed top-4 right-4 bg-cyan-800/80 p-4 rounded-lg">
                 <table class=classes!("table-auto")>
                     <tbody>
                     <tr>
