@@ -61,7 +61,7 @@ impl Component for Bean {
         );
         let onclick = self.link.callback(|_| Msg::Die);
         html! {
-            <div onclick={onclick} class="absolute bg-red-400 bg-red-700" style={ style }/>
+            <div onclick={onclick} class="absolute bg-sky-900 rounded border border-black" style={ style }/>
         }
     }
 }

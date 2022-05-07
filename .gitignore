@@ -2,7 +2,7 @@
 /dist
 /.idea
 /workers-site
-/tailwind.css
+/index.css
 /node_modules
 /package-lock.json
 /package.json
