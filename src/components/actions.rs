@@ -87,32 +87,30 @@ impl Component for Actions {
             e.cancel_bubble();
             Msg::Settings
         });
-        let (icon, pulse) = match self.state {
+        let (_icon, _pulse) = match self.state {
             State::Paused => ("play_arrow", true),
             State::Playing => ("pause", false),
         };
-        let children_hidden = match self.settings_state {
+        let _children_hidden = match self.settings_state {
             SettingsState::Open => "".to_string(),
             SettingsState::Closed => " -translate-y-0".to_string(),
         };
         html! {
-            <div class="bg-yellow-900/90 p-4 fixed bottom-4 right-4 rounded-lg">
-                <div class="flex items-center">
-                    <button onclick={ on_settings_click } class="bg-yellow-600 rounded-full relative">
-                        <div class={format!("absolute top-0 left-0 w-full h-full grid place-content-center -translate-y-[190%] ease-in-out duration-300 {}", children_hidden)}>
-                            <button onclick={ on_clear_click } class="bg-yellow-600 rounded-full p-2">
-                                <Delete svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                            </button>
-                        </div>
-                        <div class={format!("absolute top-0 left-0 w-full h-full grid place-content-center -translate-y-[100%] ease-in-out duration-300 {}",  children_hidden)}>
-                            <button onclick={ on_shuffle_click } class="bg-yellow-600 rounded-full p-2">
-                                <Refresh svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                            </button>
-                        </div>
-                        <Gear svg_class={"h-14 w-14 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
-                    </button>
-                    <button onclick={ on_play_pause_click }>
-                        <Play svg_class={"h-14 w-14 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
+            <div class="fixed bottom-4 right-4">
+                <div class="flex items-end gap-2">
+                    <div class="flex flex-col items-center gap-2">
+                        <button onclick={ on_clear_click } class="bg-yellow-600 rounded-full p-2">
+                            <Delete svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
+                        </button>
+                        <button onclick={ on_shuffle_click } class="bg-yellow-600 rounded-full p-2">
+                            <Refresh svg_class={"h-6 w-6 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
+                        </button>
+                        <button onclick={ on_settings_click } class="bg-yellow-600 rounded-full">
+                            <Gear svg_class={"h-14 w-14 stroke-white".to_string()} path_class={"fill-transparent".to_string()} />
+                        </button>
+                    </div>
+                    <button onclick={ on_play_pause_click } class="h-14 w-14 grid place-content-center bg-red-800 rounded-full">
+                        <Play svg_class={"h-14 w-14 stroke-white stroke-1".to_string()} path_class={"fill-transparent".to_string()} />
                     </button>
                 </div>
             </div>
