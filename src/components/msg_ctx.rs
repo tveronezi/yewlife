@@ -1,4 +1,3 @@
-
 use std::rc::Rc;
 
 use yew::prelude::*;
