@@ -9,3 +9,6 @@ edition = "2018"
 yew = "0.19"
 log = "0.4"
 wasm-logger = "0.2"
+gloo-utils = "0.1"
+rand = "0.8.5"
+getrandom = { version = "0.2", features = ["js"] }
