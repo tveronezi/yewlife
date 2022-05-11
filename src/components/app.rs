@@ -6,7 +6,7 @@ use yew::prelude::*;
 #[function_component(App)]
 pub fn app() -> Html {
     html! {
-        <div class="h-screen">
+        <div class="h-screen bg-black">
             <MessageProvider>
                 <Existence/>
                 <Actions/>

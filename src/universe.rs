@@ -1,3 +1,4 @@
+use crate::components::existence::Dimensions;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
@@ -8,6 +9,17 @@ pub const CELL_SIZE: i32 = 20;
 pub struct Entity {
     pub line: i32,
     pub column: i32,
+}
+
+impl Entity {
+    pub fn is_visible(&self, dimensions: &Dimensions) -> bool {
+        if self.column < 0 || self.line < 0 {
+            return false;
+        }
+        let outside_width = self.column * crate::universe::CELL_SIZE > dimensions.width;
+        let outside_height = self.line * crate::universe::CELL_SIZE > dimensions.height;
+        !(outside_height || outside_width)
+    }
 }
 
 impl Ord for Entity {

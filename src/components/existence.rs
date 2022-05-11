@@ -4,9 +4,9 @@ use yew::prelude::*;
 
 use crate::components::bean::Bean;
 
-struct Dimensions {
-    height: i32,
-    width: i32,
+pub struct Dimensions {
+    pub height: i32,
+    pub width: i32,
 }
 
 fn window_dimensions() -> Dimensions {
@@ -50,18 +50,9 @@ fn random_universe(universe: &mut universe::Universe) {
     universe.tick();
 }
 
-fn is_visible(e: &universe::Entity) -> bool {
-    if e.column < 0 || e.line < 0 {
-        return false;
-    }
-    let window = window_dimensions();
-    let outside_width = e.column * universe::CELL_SIZE > window.width;
-    let outside_height = e.line * universe::CELL_SIZE > window.height;
-    !(outside_height || outside_width)
-}
-
 #[function_component(Existence)]
 pub fn existence() -> Html {
+    let window = window_dimensions();
     let universe = use_state(|| {
         let mut universe = universe::Universe::new("");
         random_universe(&mut universe);
@@ -71,10 +62,10 @@ pub fn existence() -> Html {
     let entities = universe
         .entities
         .iter()
-        .filter(|e| is_visible(*e))
+        .filter(|e| (*e).is_visible(&window))
         .map(|e| {
             html! {
-                <Bean value={e.clone()} />
+                <Bean key={format!("c{}-l{}", e.column, e.line)} value={e.clone()} />
             }
         })
         .collect::<Html>();

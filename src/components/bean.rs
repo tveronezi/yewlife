@@ -21,6 +21,6 @@ pub fn bean(props: &Props) -> Html {
         y
     );
     html! {
-        <div class="bg-blue-300 absolute" style={ style }/>
+        <div class="bg-cyan-800 absolute rounded-full" style={ style }/>
     }
 }
