@@ -1,4 +1,4 @@
-use crate::components::existence::Dimensions;
+use crate::components::Dimensions;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
