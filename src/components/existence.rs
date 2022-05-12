@@ -23,7 +23,7 @@ pub fn existence(props: &Props) -> Html {
         })
         .collect::<Html>();
     html! {
-        <div>
+        <div class="h-full w-full overflow-hidden relative">
           {entities}
         </div>
     }

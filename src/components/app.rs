@@ -66,7 +66,12 @@ pub fn app() -> Html {
     let on_clear = Callback::from(move |_| {
         cloned_universe.set(universe::Universe::new(""));
     });
-    let on_play = Callback::from(|_| log::info!("play!"));
+    let cloned_universe = universe.clone();
+    let on_play = Callback::from(move |_| {
+        let mut new_universe = (*cloned_universe).clone();
+        new_universe.tick();
+        cloned_universe.set(new_universe);
+    });
     let dimensions = window_dimensions();
     html! {
         <div class="h-screen bg-black">
