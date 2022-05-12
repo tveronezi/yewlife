@@ -72,11 +72,17 @@ pub fn app() -> Html {
         new_universe.tick();
         cloned_universe.set(new_universe);
     });
-    let dimensions = window_dimensions();
+    let dimensions = use_state(|| window_dimensions());
+    let dimensions_clone = dimensions.clone();
+    let onresize = Callback::from(move |_| {
+        let new_dyn = window_dimensions();
+        log::info!("resizing.... {:?}", &new_dyn);
+        dimensions_clone.set(new_dyn);
+    });
     html! {
-        <div class="h-screen bg-black">
+        <div {onresize} class="h-screen bg-black">
             <MessageProvider>
-                <Existence universe={(*universe).clone()} {dimensions} />
+                <Existence universe={(*universe).clone()} dimensions={(*dimensions).clone()} />
                 <Actions {on_clear} {on_play} {on_shuffle} />
             </MessageProvider>
         </div>

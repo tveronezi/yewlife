@@ -5,7 +5,7 @@ pub mod existence;
 pub mod icons;
 pub mod msg_ctx;
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Debug)]
 pub struct Dimensions {
     pub height: i32,
     pub width: i32,
