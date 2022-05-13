@@ -3,6 +3,7 @@ use crate::components::existence::Existence;
 use crate::components::msg_ctx::MessageProvider;
 use crate::components::Dimensions;
 use crate::universe;
+use gloo_events::EventListener;
 use rand::Rng;
 use yew::prelude::*;
 
@@ -72,15 +73,18 @@ pub fn app() -> Html {
         new_universe.tick();
         cloned_universe.set(new_universe);
     });
-    let dimensions = use_state(|| window_dimensions());
+    let dimensions = use_state(window_dimensions);
     let dimensions_clone = dimensions.clone();
-    let onresize = Callback::from(move |_| {
-        let new_dyn = window_dimensions();
-        log::info!("resizing.... {:?}", &new_dyn);
-        dimensions_clone.set(new_dyn);
+    let _ = use_state(|| {
+        log::info!("added listener");
+        EventListener::new(&gloo_utils::window(), "resize", move |_| {
+            let new_dyn = window_dimensions();
+            log::info!("resizing.... {:?}", &new_dyn);
+            dimensions_clone.set(new_dyn);
+        })
     });
     html! {
-        <div {onresize} class="h-screen bg-black">
+        <div class="h-screen bg-black">
             <MessageProvider>
                 <Existence universe={(*universe).clone()} dimensions={(*dimensions).clone()} />
                 <Actions {on_clear} {on_play} {on_shuffle} />
