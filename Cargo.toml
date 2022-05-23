@@ -9,6 +9,8 @@ edition = "2018"
 yew = "0.19"
 log = "0.4"
 wasm-logger = "0.2"
+wasm-bindgen = "0.2.80"
+web-sys = {version="0.3.57", features=["Node"]}
 gloo-utils = "0.1"
 gloo-events = "0.1.2"
 rand = "0.8.5"
