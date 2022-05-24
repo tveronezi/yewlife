@@ -49,6 +49,7 @@ pub enum Command {
     Shuffle,
     Clear,
     Tick,
+    Delete(Rc<Entity>),
 }
 
 impl Reducible for Universe {
@@ -66,6 +67,11 @@ impl Reducible for Universe {
             Command::Tick => {
                 let mut universe = (*self).clone();
                 universe.tick();
+                universe
+            }
+            Command::Delete(entity) => {
+                let mut universe = (*self).clone();
+                universe.entities.remove(&entity);
                 universe
             }
         })
