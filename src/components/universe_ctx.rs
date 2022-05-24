@@ -41,7 +41,7 @@ pub fn window_dimensions() -> Dimensions {
 fn add_entity(universe: &mut Universe, x: i32, y: i32) {
     let column = x / CELL_SIZE;
     let line = y / CELL_SIZE;
-    let entity = Entity { line, column };
+    let entity = Rc::new(Entity { line, column });
     universe.entities.insert(entity);
 }
 
