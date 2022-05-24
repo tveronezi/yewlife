@@ -13,5 +13,6 @@ wasm-bindgen = "0.2.80"
 web-sys = {version="0.3.57", features=["Node"]}
 gloo-utils = "0.1"
 gloo-events = "0.1.2"
+gloo-timers = "0.2.4"
 rand = "0.8.5"
 getrandom = { version = "0.2", features = ["js"] }

@@ -3,6 +3,7 @@ use crate::{
     universe::Universe,
 };
 use gloo_events::{EventListener, EventListenerOptions};
+use gloo_timers::callback::Interval;
 use wasm_bindgen::JsCast;
 use web_sys::Node;
 use yew::prelude::*;
@@ -31,17 +32,24 @@ pub fn actions() -> Html {
     let reset_btn_ref = use_node_ref();
     let play_btn_ref = use_node_ref();
     let gear_btn_ref = use_node_ref();
+    let interval: UseStateHandle<Option<Interval>> = use_state(|| None);
+    let interval_clone = interval.clone();
     let universe_clone = universe.clone();
     let on_clear_click = Callback::from(move |_| {
+        interval_clone.set(None);
         universe_clone.dispatch(Command::Clear);
     });
     let universe_clone = universe.clone();
+    let interval_clone = interval.clone();
     let on_play_click = Callback::from(move |_| {
-        universe_clone.dispatch(Command::Play);
+        let universe_clone = universe_clone.clone();
+        interval_clone.set(Some(Interval::new(100, move || {
+            universe_clone.dispatch(Command::Tick);
+        })));
     });
-    let universe_clone = universe.clone();
     let on_shuffle_click = Callback::from(move |_| {
-        universe_clone.dispatch(Command::Shuffle);
+        interval.set(None);
+        universe.dispatch(Command::Shuffle);
     });
     let options = EventListenerOptions::run_in_capture_phase();
     let btns = vec![
@@ -50,7 +58,6 @@ pub fn actions() -> Html {
         play_btn_ref.clone(),
         gear_btn_ref.clone(),
     ];
-    let cloned_state = state.clone();
     let _ = use_state(move || {
         EventListener::new_with_options(
             &gloo_utils::window(),
@@ -70,7 +77,7 @@ pub fn actions() -> Html {
                     }
                 }
                 log::info!("clicked outside: {:?}", e.target());
-                cloned_state.set(State::Collapsed);
+                state.set(State::Collapsed);
             },
         )
     });

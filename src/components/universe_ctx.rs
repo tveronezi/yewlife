@@ -48,7 +48,7 @@ fn add_entity(universe: &mut Universe, x: i32, y: i32) {
 pub enum Command {
     Shuffle,
     Clear,
-    Play,
+    Tick,
 }
 
 impl Reducible for Universe {
@@ -63,7 +63,7 @@ impl Reducible for Universe {
                 universe
             }
             Command::Clear => Universe::new(""),
-            Command::Play => {
+            Command::Tick => {
                 let mut universe = (*self).clone();
                 universe.tick();
                 universe
