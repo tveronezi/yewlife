@@ -10,10 +10,8 @@ pub fn existence() -> Html {
     let dimensions = use_state(window_dimensions);
     let dimensions_clone = dimensions.clone();
     let _ = use_state(|| {
-        log::info!("added listener");
         EventListener::new(&gloo_utils::window(), "resize", move |_| {
             let new_dyn = window_dimensions();
-            log::info!("resizing.... {:?}", &new_dyn);
             dimensions_clone.set(new_dyn);
         })
     });
