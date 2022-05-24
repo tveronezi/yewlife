@@ -1,21 +1,26 @@
 use crate::components::bean::Bean;
-use crate::components::Dimensions;
-use crate::universe;
+use crate::components::universe_ctx::window_dimensions;
+use crate::universe::Universe;
+use gloo_events::EventListener;
 use yew::prelude::*;
 
-#[derive(PartialEq, Properties, Clone)]
-pub struct Props {
-    pub universe: universe::Universe,
-    pub dimensions: Dimensions,
-}
-
 #[function_component(Existence)]
-pub fn existence(props: &Props) -> Html {
-    let entities = props
-        .universe
+pub fn existence() -> Html {
+    let universe = use_context::<UseReducerHandle<Universe>>().expect("no universe ctx found");
+    let dimensions = use_state(window_dimensions);
+    let dimensions_clone = dimensions.clone();
+    let _ = use_state(|| {
+        log::info!("added listener");
+        EventListener::new(&gloo_utils::window(), "resize", move |_| {
+            let new_dyn = window_dimensions();
+            log::info!("resizing.... {:?}", &new_dyn);
+            dimensions_clone.set(new_dyn);
+        })
+    });
+    let entities = universe
         .entities
         .iter()
-        .filter(|e| (*e).is_visible(&props.dimensions))
+        .filter(|e| (*e).is_visible(&dimensions))
         .map(|e| {
             html! {
                 <Bean key={format!("c{}-l{}", e.column, e.line)} value={e.clone()} />

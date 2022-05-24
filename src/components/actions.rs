@@ -1,15 +1,13 @@
-use crate::components::icons::{GearIcon, PlayIcon, RefreshIcon, TrashIcon};
+use crate::{
+    components::icons::{GearIcon, PlayIcon, RefreshIcon, TrashIcon},
+    universe::Universe,
+};
 use gloo_events::{EventListener, EventListenerOptions};
 use wasm_bindgen::JsCast;
 use web_sys::Node;
 use yew::prelude::*;
 
-#[derive(PartialEq, Properties, Clone)]
-pub struct Props {
-    pub on_shuffle: Callback<()>,
-    pub on_clear: Callback<()>,
-    pub on_play: Callback<()>,
-}
+use super::universe_ctx::Command;
 
 enum State {
     Expanded,
@@ -17,7 +15,8 @@ enum State {
 }
 
 #[function_component(Actions)]
-pub fn actions(props: &Props) -> Html {
+pub fn actions() -> Html {
+    let universe = use_context::<UseReducerHandle<Universe>>().expect("no universe ctx found");
     let state = use_state(|| State::Collapsed);
     let cloned_state = state.clone();
     let on_gear_click = Callback::from(move |_| match *cloned_state {
@@ -32,17 +31,17 @@ pub fn actions(props: &Props) -> Html {
     let reset_btn_ref = use_node_ref();
     let play_btn_ref = use_node_ref();
     let gear_btn_ref = use_node_ref();
-    let on_clear_clone = props.on_clear.clone();
+    let universe_clone = universe.clone();
     let on_clear_click = Callback::from(move |_| {
-        on_clear_clone.emit(());
+        universe_clone.dispatch(Command::Clear);
     });
-    let on_play_clone = props.on_play.clone();
+    let universe_clone = universe.clone();
     let on_play_click = Callback::from(move |_| {
-        on_play_clone.emit(());
+        universe_clone.dispatch(Command::Play);
     });
-    let on_shuffle_clone = props.on_shuffle.clone();
+    let universe_clone = universe.clone();
     let on_shuffle_click = Callback::from(move |_| {
-        on_shuffle_clone.emit(());
+        universe_clone.dispatch(Command::Shuffle);
     });
     let options = EventListenerOptions::run_in_capture_phase();
     let btns = vec![
