@@ -72,11 +72,9 @@ pub fn actions() -> Html {
                 for btn in &btns {
                     let btn = btn.get().unwrap();
                     if btn.contains(Some(&target)) {
-                        log::info!("clicked inside: {:?}", e.target());
                         return;
                     }
                 }
-                log::info!("clicked outside: {:?}", e.target());
                 state.set(State::Collapsed);
             },
         )

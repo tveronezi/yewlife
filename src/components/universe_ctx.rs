@@ -50,6 +50,7 @@ pub enum Command {
     Clear,
     Tick,
     Delete(Rc<Entity>),
+    Add { x: i32, y: i32 },
 }
 
 impl Reducible for Universe {
@@ -72,6 +73,11 @@ impl Reducible for Universe {
             Command::Delete(entity) => {
                 let mut universe = (*self).clone();
                 universe.entities.remove(&entity);
+                universe
+            }
+            Command::Add { x, y } => {
+                let mut universe = (*self).clone();
+                add_entity(&mut universe, x, y);
                 universe
             }
         })

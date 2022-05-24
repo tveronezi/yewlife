@@ -1,3 +1,4 @@
+use super::universe_ctx::Command;
 use crate::components::bean::Bean;
 use crate::components::universe_ctx::window_dimensions;
 use crate::universe::Universe;
@@ -25,8 +26,13 @@ pub fn existence() -> Html {
             }
         })
         .collect::<Html>();
+    let onclick = Callback::from(move |e: MouseEvent| {
+        let x = e.x();
+        let y = e.y();
+        universe.dispatch(Command::Add { x, y });
+    });
     html! {
-        <div class="h-full w-full overflow-hidden relative">
+        <div {onclick} class="h-full w-full overflow-hidden relative">
           {entities}
         </div>
     }
