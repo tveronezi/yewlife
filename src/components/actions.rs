@@ -1,5 +1,5 @@
 use crate::{
-    components::icons::{GearIcon, PlayIcon, RefreshIcon, TrashIcon},
+    components::icons::{GearIcon, PauseIcon, PlayIcon, RefreshIcon, TrashIcon},
     universe::Universe,
 };
 use gloo_events::{EventListener, EventListenerOptions};
@@ -35,16 +35,25 @@ pub fn action_button(props: &ActionButtonProps) -> Html {
     let onclick = Callback::from(move |_| {
         prop_callback.emit(());
     });
+    let content = html! {
+        <div class="relative">
+            <div class="w-10 h-10 absolute">
+                { for props.children.iter() }
+            </div>
+            <div class="w-10 h-10 transition-all hover:bg-yellow-500 rounded-full blur-lg">
+            </div>
+        </div>
+    };
     let class = &props.class;
     match &props.reference {
         Some(reference) => html! {
             <button ref={reference} {onclick} {class}>
-                { for props.children.iter() }
+                { content }
             </button>
         },
         None => html! {
             <button {onclick} {class}>
-                { for props.children.iter() }
+                { content }
             </button>
         },
     }
@@ -53,19 +62,14 @@ pub fn action_button(props: &ActionButtonProps) -> Html {
 #[function_component(Actions)]
 pub fn actions() -> Html {
     let universe = use_context::<UseReducerHandle<Universe>>().expect("no universe ctx found");
-    let state = use_state(|| GearState::Collapsed);
-    let cloned_state = state.clone();
-    let on_gear_click = Callback::from(move |_| match *cloned_state {
-        GearState::Expanded => cloned_state.set(GearState::Collapsed),
-        GearState::Collapsed => cloned_state.set(GearState::Expanded),
+    let gear_state = use_state(|| GearState::Collapsed);
+    let cloned_gear_state = gear_state.clone();
+    let on_gear_click = Callback::from(move |_| match *cloned_gear_state {
+        GearState::Expanded => cloned_gear_state.set(GearState::Collapsed),
+        GearState::Collapsed => cloned_gear_state.set(GearState::Expanded),
     });
-    let (clear_bnt, reset_btn) = match *state {
-        GearState::Expanded => ("", ""),
-        GearState::Collapsed => ("translate-y-[110px]", "translate-y-[60px]"),
-    };
     let clear_btn_ref = use_node_ref();
     let reset_btn_ref = use_node_ref();
-    let play_btn_ref = use_node_ref();
     let gear_btn_ref = use_node_ref();
     let interval: UseStateHandle<Option<Interval>> = use_state(|| None);
     let interval_clone = interval.clone();
@@ -99,9 +103,12 @@ pub fn actions() -> Html {
     let btns = vec![
         clear_btn_ref.clone(),
         reset_btn_ref.clone(),
-        play_btn_ref.clone(),
         gear_btn_ref.clone(),
     ];
+    let gear_actions_cls = match *gear_state {
+        GearState::Expanded => "",
+        GearState::Collapsed => "translate-y-0 opacity-0",
+    };
     let _ = use_state(move || {
         EventListener::new_with_options(
             &gloo_utils::window(),
@@ -119,41 +126,41 @@ pub fn actions() -> Html {
                         return;
                     }
                 }
-                state.set(GearState::Collapsed);
+                gear_state.set(GearState::Collapsed);
             },
         )
     });
     html! {
-        <>
-            <div class={format!("h-14 w-14 grid place-content-center fixed bottom-[145px] right-[85px] transition-transform {}", clear_bnt)}>
-                <ActionButton reference={clear_btn_ref} onclick={on_clear_click} class="rounded-full bg-gray-500 p-2">
-                    <TrashIcon svg_class="h-8 w-8 fill-gray-500" path_class="stroke-white"/>
+        <div class="flex fixed bottom-0 right-0 p-2">
+            <div class="space-y-2">
+                <div class="relative">
+                    <ActionButton reference={clear_btn_ref} onclick={on_clear_click} class={format!("grid place-items-center absolute -translate-y-[90px] opacity-100 transition-all {}", gear_actions_cls)}>
+                        <TrashIcon class="h-10 w-10 fill-gray-400"/>
+                    </ActionButton>
+                    <ActionButton reference={reset_btn_ref} onclick={on_shuffle_click} class={format!("grid place-items-center absolute -translate-y-[40px] opacity-100 transition-all {}", gear_actions_cls)}>
+                        <RefreshIcon class="h-10 w-10 fill-gray-400"/>
+                    </ActionButton>
+                </div>
+                <ActionButton reference={gear_btn_ref} onclick={on_gear_click} class="grid place-items-center">
+                    <GearIcon class="h-10 w-10 fill-white"/>
                 </ActionButton>
             </div>
-            <div class={format!("h-14 w-14 grid place-content-center fixed bottom-[90px] right-[85px] transition-transform {}", reset_btn)}>
-                <ActionButton reference={reset_btn_ref} onclick={on_shuffle_click} class="rounded-full bg-gray-500 p-2">
-                    <RefreshIcon svg_class="h-8 w-8 fill-white"/>
-                </ActionButton>
-            </div>
-            <div class="fixed bottom-[25px] right-[25px] flex items-center">
-                <ActionButton reference={gear_btn_ref} onclick={on_gear_click} class="rounded-full bg-gray-500 p-1">
-                    <GearIcon svg_class="h-14 w-14 fill-white"/>
-                </ActionButton>
-                {
-                    match *play_state {
-                        PlayState::Playing => html! {
-                            <ActionButton onclick={on_pause_click}>
-                                <PlayIcon svg_class="h-14 w-14 fill-yellow-600"/>
-                            </ActionButton>
-                        },
-                        PlayState::Paused => html! {
-                            <ActionButton reference={play_btn_ref} onclick={on_play_click}>
-                                <PlayIcon svg_class="h-14 w-14 fill-yellow-600"/>
-                            </ActionButton>
-                        }
+            <div class="flex items-end">
+            {
+                match *play_state {
+                    PlayState::Playing => html! {
+                        <ActionButton onclick={on_pause_click}>
+                            <PauseIcon class="h-10 w-10 fill-green-400"/>
+                        </ActionButton>
+                    },
+                    PlayState::Paused => html! {
+                        <ActionButton onclick={on_play_click}>
+                            <PlayIcon class="h-10 w-10 fill-yellow-400"/>
+                        </ActionButton>
                     }
                 }
+            }
             </div>
-        </>
+        </div>
     }
 }
