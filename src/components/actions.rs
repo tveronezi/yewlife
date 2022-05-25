@@ -105,9 +105,9 @@ pub fn actions() -> Html {
         reset_btn_ref.clone(),
         gear_btn_ref.clone(),
     ];
-    let gear_actions_cls = match *gear_state {
-        GearState::Expanded => "",
-        GearState::Collapsed => "translate-y-0 opacity-0",
+    let (gear_trash_actions_cls, gear_reset_actions_cls ) = match *gear_state {
+        GearState::Expanded => ("-translate-y-[90px] opacity-100", "-translate-y-[40px] opacity-100"),
+        GearState::Collapsed => ("translate-y-0 opacity-0", "translate-y-0 opacity-0"),
     };
     let _ = use_state(move || {
         EventListener::new_with_options(
@@ -134,10 +134,10 @@ pub fn actions() -> Html {
         <div class="flex fixed bottom-0 right-0 p-2">
             <div class="space-y-2">
                 <div class="relative">
-                    <ActionButton reference={clear_btn_ref} onclick={on_clear_click} class={format!("grid place-items-center absolute -translate-y-[90px] opacity-100 transition-all {}", gear_actions_cls)}>
+                    <ActionButton reference={clear_btn_ref} onclick={on_clear_click} class={format!("grid place-items-center absolute transition-all {}", gear_trash_actions_cls)}>
                         <TrashIcon class="h-10 w-10 fill-gray-400"/>
                     </ActionButton>
-                    <ActionButton reference={reset_btn_ref} onclick={on_shuffle_click} class={format!("grid place-items-center absolute -translate-y-[40px] opacity-100 transition-all {}", gear_actions_cls)}>
+                    <ActionButton reference={reset_btn_ref} onclick={on_shuffle_click} class={format!("grid place-items-center absolute transition-all {}", gear_reset_actions_cls)}>
                         <RefreshIcon class="h-10 w-10 fill-gray-400"/>
                     </ActionButton>
                 </div>
