@@ -24,6 +24,12 @@ pub fn bean(props: &Props) -> Html {
         universe.dispatch(Command::Delete(cloned_entity.clone()));
     });
     html! {
-        <button {onclick} class="border border-black bg-cyan-800 absolute rounded-full" style={ style }/>
+        <div class="absolute" {style}>
+            <div class="relative" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}>
+                <button {onclick} class="absolute w-full h-full border border-black bg-cyan-800 rounded-full" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}/>
+                <div class="transition-all bg-yellow-400 hover:bg-yellow-500 rounded-full blur-lg" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}>
+                </div>
+            </div>
+        </div>
     }
 }
