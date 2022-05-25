@@ -39,4 +39,4 @@ Terminal two:
 trunk serve
 ```
 
-Now open http://localhost:8080/
+Now open http://localhost:3000/
