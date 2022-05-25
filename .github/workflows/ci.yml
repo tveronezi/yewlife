@@ -29,13 +29,16 @@ jobs:
         run: echo ${{ env.RELEASE_VERSION }}
       - uses: actions/checkout@v2
       - uses: actions/cache@v2
+        if: github.event_name != 'release'
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/bin
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ github.head_ref || 'main' }}
+          restore-keys: |
+            main
       - name: Install tailwind
         run: |
           npm install -D tailwindcss
