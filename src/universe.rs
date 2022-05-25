@@ -1,13 +1,26 @@
+use crate::components::Dimensions;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
+use std::rc::Rc;
 
-pub const CELL_SIZE: i32 = 10;
+pub const CELL_SIZE: i32 = 20;
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Entity {
     pub line: i32,
     pub column: i32,
+}
+
+impl Entity {
+    pub fn is_visible(&self, dimensions: &Dimensions) -> bool {
+        if self.column < 0 || self.line < 0 {
+            return false;
+        }
+        let outside_width = self.column * crate::universe::CELL_SIZE > dimensions.width;
+        let outside_height = self.line * crate::universe::CELL_SIZE > dimensions.height;
+        !(outside_height || outside_width)
+    }
 }
 
 impl Ord for Entity {
@@ -28,7 +41,7 @@ impl PartialOrd for Entity {
 
 #[derive(Eq, PartialEq, Debug, Clone)]
 pub struct Universe {
-    pub entities: BTreeSet<Entity>,
+    pub entities: BTreeSet<Rc<Entity>>,
 }
 
 impl Display for Universe {
@@ -36,7 +49,7 @@ impl Display for Universe {
         write!(
             f,
             "Universe {:?}",
-            self.entities.iter().cloned().collect::<Vec<Entity>>()
+            self.entities.iter().cloned().collect::<Vec<Rc<Entity>>>()
         )
     }
 }
@@ -54,10 +67,10 @@ impl Universe {
         for (line, line_value) in matrix.trim().lines().enumerate() {
             for (column, entry) in line_value.chars().enumerate() {
                 if entry == '1' {
-                    universe.insert(Entity {
+                    universe.insert(Rc::new(Entity {
                         line: line as i32,
                         column: column as i32,
-                    });
+                    }));
                 }
             }
         }
@@ -134,7 +147,7 @@ impl Universe {
         for line in (x_min - 1)..(x_max + 2) {
             for column in (y_min - 1)..(y_max + 2) {
                 let neighbors = self.number_of_neighbors(line, column);
-                let this_cell = Entity { line, column };
+                let this_cell = Rc::new(Entity { line, column });
                 let exist = self.entities.get(&this_cell).is_some();
                 if !exist {
                     if neighbors == 3 {
@@ -217,14 +230,14 @@ mod tests {
     fn test_universe_order() {
         let entities = BTreeSet::from_iter(
             vec![
-                Entity { line: 1, column: 0 },
-                Entity { line: 0, column: 0 },
-                Entity { line: 0, column: 0 },
-                Entity { line: 0, column: 1 },
-                Entity {
+                Rc::new(Entity { line: 1, column: 0 }),
+                Rc::new(Entity { line: 0, column: 0 }),
+                Rc::new(Entity { line: 0, column: 0 }),
+                Rc::new(Entity { line: 0, column: 1 }),
+                Rc::new(Entity {
                     line: 0,
                     column: -1,
-                },
+                }),
             ]
             .iter()
             .cloned(),
@@ -232,15 +245,15 @@ mod tests {
         let universe = Universe { entities };
         let mut iter = universe.entities.iter();
         assert_eq!(
-            Some(&Entity {
+            Some(&Rc::new(Entity {
                 line: 0,
                 column: -1
-            }),
+            })),
             iter.next()
         );
-        assert_eq!(Some(&Entity { line: 0, column: 0 }), iter.next());
-        assert_eq!(Some(&Entity { line: 0, column: 1 }), iter.next());
-        assert_eq!(Some(&Entity { line: 1, column: 0 }), iter.next());
+        assert_eq!(Some(&Rc::new(Entity { line: 0, column: 0 })), iter.next());
+        assert_eq!(Some(&Rc::new(Entity { line: 0, column: 1 })), iter.next());
+        assert_eq!(Some(&Rc::new(Entity { line: 1, column: 0 })), iter.next());
         assert_eq!(None, iter.next());
     }
 

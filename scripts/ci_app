@@ -13,6 +13,9 @@ cargo clippy --all-targets --all-features -- -D warnings
 # Test it
 cargo test
 
+# Built index.css
+npx tailwindcss -i ./base.css -o ./index.css
+
 # Build it
 trunk build --release
 

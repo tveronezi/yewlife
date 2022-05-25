@@ -15,6 +15,9 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [17.x]
     steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -33,6 +36,10 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install tailwind
+        run: |
+          npm install -D tailwindcss
+          npx tailwindcss init
       - name: Install trunk
         run: cargo install --locked trunk || true
       - name: Install wasm-bindgen-cli

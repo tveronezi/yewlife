@@ -2,3 +2,7 @@
 /dist
 /.idea
 /workers-site
+/index.css
+/node_modules
+/package-lock.json
+/package.json

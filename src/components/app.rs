@@ -1,30 +1,17 @@
+use crate::components::actions::Actions;
 use crate::components::existence::Existence;
-use yew::{classes, html, Component, ComponentLink, Html, ShouldRender};
+use crate::components::universe_ctx::UniverseProvider;
 
-pub struct App();
+use yew::prelude::*;
 
-impl Component for App {
-    type Message = ();
-    type Properties = ();
-
-    fn create(_props: Self::Properties, _link: ComponentLink<Self>) -> Self {
-        Self()
-    }
-
-    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
-        false
-    }
-
-    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        false
-    }
-
-    fn view(&self) -> Html {
-        log::info!("app");
-        html! {
-            <div class=classes!("app")>
-                <Existence/>
-            </div>
-        }
+#[function_component(App)]
+pub fn app() -> Html {
+    html! {
+        <div class="h-screen bg-black">
+            <UniverseProvider>
+                <Existence />
+                <Actions />
+            </UniverseProvider>
+        </div>
     }
 }

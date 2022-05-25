@@ -1,67 +1,35 @@
-use crate::universe;
-use yew::{html, Callback, Component, ComponentLink, Html, Properties, ShouldRender};
+use std::rc::Rc;
 
-#[derive(Debug)]
-pub enum Msg {
-    Die,
-}
+use yew::prelude::*;
 
-#[derive(Debug)]
-pub enum CallbackMsg {
-    Die(universe::Entity),
-}
+use crate::universe::{Entity, Universe, CELL_SIZE};
 
-#[derive(Clone, Properties)]
+use super::universe_ctx::Command;
+
+#[derive(PartialEq, Properties, Clone)]
 pub struct Props {
-    pub value: universe::Entity,
-    pub onchange: Callback<CallbackMsg>,
+    pub value: Rc<Entity>,
 }
 
-pub struct Bean {
-    // `ComponentLink` is like a reference to a component.
-    // It can be used to send messages to the component
-    link: ComponentLink<Self>,
-    value: universe::Entity,
-    onchange: Callback<CallbackMsg>,
-}
-
-impl Component for Bean {
-    type Message = Msg;
-    type Properties = Props;
-
-    fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self {
-            link,
-            value: props.value,
-            onchange: props.onchange,
-        }
-    }
-
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        match msg {
-            Msg::Die => {
-                self.onchange.emit(CallbackMsg::Die(self.value.clone()));
-                true
-            }
-        }
-    }
-
-    fn change(&mut self, props: Self::Properties) -> ShouldRender {
-        let changed = self.value != props.value;
-        self.value = props.value;
-        changed
-    }
-
-    fn view(&self) -> Html {
-        log::info!("bean");
-        let (x, y) = (
-            self.value.line * universe::CELL_SIZE,
-            self.value.column * universe::CELL_SIZE,
-        );
-        let style = format!("top: {}px; left: {}px", x, y);
-        let onclick = self.link.callback(|_| Msg::Die);
-        html! {
-            <div onclick={onclick} class="app-entity red lighten-2" style={ style }/>
-        }
+#[function_component(Bean)]
+pub fn bean(props: &Props) -> Html {
+    let universe = use_context::<UseReducerHandle<Universe>>().expect("no universe ctx found");
+    let (x, y) = (props.value.line * CELL_SIZE, props.value.column * CELL_SIZE);
+    let style = format!(
+        "height: {}px; width: {}px; top: {}px; left: {}px",
+        CELL_SIZE, CELL_SIZE, x, y
+    );
+    let cloned_entity = props.value.clone();
+    let onclick = Callback::from(move |_| {
+        universe.dispatch(Command::Delete(cloned_entity.clone()));
+    });
+    html! {
+        <div class="absolute" {style}>
+            <div class="relative" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}>
+                <button {onclick} class="absolute w-full h-full border border-black bg-cyan-800 rounded-full" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}/>
+                <div class="transition-all bg-yellow-400 hover:bg-yellow-500 rounded-full blur-lg" style={format!("height: {}px; width: {}px;", CELL_SIZE, CELL_SIZE)}>
+                </div>
+            </div>
+        </div>
     }
 }
