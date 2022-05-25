@@ -105,8 +105,11 @@ pub fn actions() -> Html {
         reset_btn_ref.clone(),
         gear_btn_ref.clone(),
     ];
-    let (gear_trash_actions_cls, gear_reset_actions_cls ) = match *gear_state {
-        GearState::Expanded => ("-translate-y-[90px] opacity-100", "-translate-y-[40px] opacity-100"),
+    let (gear_trash_actions_cls, gear_reset_actions_cls) = match *gear_state {
+        GearState::Expanded => (
+            "-translate-y-[90px] opacity-100",
+            "-translate-y-[40px] opacity-100",
+        ),
         GearState::Collapsed => ("translate-y-0 opacity-0", "translate-y-0 opacity-0"),
     };
     let _ = use_state(move || {
