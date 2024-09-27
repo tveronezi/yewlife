@@ -21,7 +21,7 @@ enum PlayState {
     Paused,
 }
 
-#[derive(PartialEq, Properties, Clone)]
+#[derive(PartialEq, Clone, Properties)]
 pub struct ActionButtonProps {
     pub class: Option<String>,
     pub children: Children,
