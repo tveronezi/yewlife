@@ -55,7 +55,7 @@ jobs:
         run: ./scripts/ci_docker
       - name: Publish cloudflare worker
         if: github.ref == 'refs/heads/main'
-        uses: cloudflare/wrangler-action@1.3.0
+        uses: cloudflare/wrangler-action@v3
         env:
           USER: root
         with:
