@@ -3,10 +3,11 @@ use std::cmp::Ordering;
 use std::collections::BTreeSet;
 use std::fmt::{Debug, Display, Formatter, Result};
 use std::rc::Rc;
+use yew::prelude::*;
 
 pub const CELL_SIZE: i32 = 20;
 
-#[derive(Eq, PartialEq, Debug, Clone)]
+#[derive(Eq, PartialEq, Debug, Clone, Properties)]
 pub struct Entity {
     pub line: i32,
     pub column: i32,
@@ -39,7 +40,7 @@ impl PartialOrd for Entity {
     }
 }
 
-#[derive(Eq, PartialEq, Debug, Clone)]
+#[derive(Eq, PartialEq, Debug, Clone, Properties)]
 pub struct Universe {
     pub entities: BTreeSet<Rc<Entity>>,
 }
@@ -54,6 +55,7 @@ impl Display for Universe {
     }
 }
 
+#[derive(Eq, PartialEq, Debug, Clone, Properties)]
 struct Boundaries {
     line_max: i32,
     line_min: i32,
@@ -93,7 +95,7 @@ impl Universe {
     }
 
     fn number_of_neighbors(&mut self, line: i32, column: i32) -> usize {
-        vec![
+        [
             self.entities.get(&Entity {
                 line: line - 1,
                 column: column - 1,
@@ -148,7 +150,7 @@ impl Universe {
             for column in (y_min - 1)..(y_max + 2) {
                 let neighbors = self.number_of_neighbors(line, column);
                 let this_cell = Rc::new(Entity { line, column });
-                let exist = self.entities.get(&this_cell).is_some();
+                let exist = self.entities.contains(&this_cell);
                 if !exist {
                     if neighbors == 3 {
                         new_entities.insert(this_cell);
@@ -229,7 +231,7 @@ mod tests {
     #[test]
     fn test_universe_order() {
         let entities = BTreeSet::from_iter(
-            vec![
+            [
                 Rc::new(Entity { line: 1, column: 0 }),
                 Rc::new(Entity { line: 0, column: 0 }),
                 Rc::new(Entity { line: 0, column: 0 }),
