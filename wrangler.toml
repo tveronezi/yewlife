@@ -3,3 +3,4 @@ usage_model = "bundled"
 workers_dev = true
 site = {bucket = "./dist"}
 compatibility_date = "2021-09-24"
+main = "index.js"
