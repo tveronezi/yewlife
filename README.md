@@ -22,7 +22,7 @@ One-time commands:
 ```shell
 cargo install trunk wasm-bindgen-cli
 rustup target add wasm32-unknown-unknown
-npm install -D tailwindcss
+npm install -D tailwindcss @tailwindcss/cli
 ```
 
 ## How to run it in development mode?
@@ -30,7 +30,7 @@ npm install -D tailwindcss
 Terminal one:
 
 ```
-npx tailwindcss -i ./base.css -o ./index.css --watch
+npx @tailwindcss/cli -i ./base.css -o ./index.css --watch
 ```
 
 Terminal two:
